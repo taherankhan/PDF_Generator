@@ -1,0 +1,149 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.splash-screen {
+  position: fixed;
+  z-index: 10000;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #ffffff;
+  color: #1f2937;
+  overflow: hidden;
+}
+
+/* Animated Background Circles */
+.splash-screen::before,
+.splash-screen::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.05;
+}
+
+.splash-screen::before {
+  width: 500px;
+  height: 500px;
+  background: #3b82f6;
+  top: -250px;
+  right: -250px;
+  animation: float 8s ease-in-out infinite;
+}
+
+.splash-screen::after {
+  width: 400px;
+  height: 400px;
+  background: #3b82f6;
+  bottom: -200px;
+  left: -200px;
+  animation: float 6s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(30px, 30px);
+  }
+}
+
+/* Loading Text Container */
+.loading-container {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Main Loading Text */
+.loading-text {
+  font-size: 56px;
+  font-weight: 700;
+  letter-spacing: 12px;
+  color: #1f2937;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: scale(0.8);
+  margin-bottom: 40px;
+}
+
+/* Individual Letter Animation */
+.loading-text span {
+  display: inline-block;
+  opacity: 0;
+}
+
+/* Loading Percentage */
+.loading-percentage {
+  font-size: 18px;
+  font-weight: 600;
+  color: #3b82f6;
+  margin-bottom: 16px;
+  opacity: 0;
+  letter-spacing: 2px;
+}
+
+/* Progress Bar Container */
+.progress-container {
+  width: 400px;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+  opacity: 0;
+  position: relative;
+}
+
+.progress-bar {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+  border-radius: 3px;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+  transition: width 0.1s linear;
+}
+
+/* Dark Mode Support */
+[data-bs-theme='dark'] .splash-screen {
+  background: #0f172a;
+  color: #f1f5f9;
+}
+
+[data-bs-theme='dark'] .loading-text {
+  color: #f1f5f9;
+}
+
+[data-bs-theme='dark'] .progress-container {
+  background: #1e293b;
+}
+
+[data-bs-theme='dark'] .splash-screen::before,
+[data-bs-theme='dark'] .splash-screen::after {
+  background: #3b82f6;
+  opacity: 0.1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .loading-text {
+    font-size: 42px;
+    letter-spacing: 8px;
+  }
+  
+  .progress-container {
+    width: 300px;
+  }
+  
+  .loading-percentage {
+    font-size: 16px;
+  }
+}
