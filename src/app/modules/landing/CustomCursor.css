@@ -1,0 +1,77 @@
+/* Custom Cursor CSS Styles */
+
+/* Main cursor dot styling */
+.custom-cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  background-color: white;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: difference;
+}
+
+/* Outer trailing ring styling */
+.custom-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: 32px;
+  border: 1px solid white;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  mix-blend-mode: difference;
+}
+
+/* Expanding click wave ring */
+.custom-cursor-click {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 64px;
+  height: 64px;
+  border: 2px solid white;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9996;
+  mix-blend-mode: difference;
+}
+
+/* Hides default browser cursor for the application container */
+.app-container {
+  cursor: none !important;
+}
+
+/* Hides default browser cursor for interactive elements within the container */
+.app-container a,
+.app-container button,
+.app-container select,
+.app-container input,
+.app-container textarea,
+.app-container [role="button"],
+.app-container label,
+.app-container .lp-theme-row-btn,
+.app-container .lp-workflow-tab-btn,
+.app-container .lp-bento-theme-bubble,
+.app-container .lp-social-btn {
+  cursor: none !important;
+}
+
+/* Hides custom cursor on touch devices natively */
+@media (hover: none) and (pointer: coarse) {
+  .app-container,
+  .app-container a,
+  .app-container button,
+  .app-container select,
+  .app-container input,
+  .app-container textarea,
+  .app-container [role="button"],
+  .app-container label {
+    cursor: auto !important;
+  }
+}

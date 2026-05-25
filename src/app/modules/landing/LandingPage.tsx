@@ -1,6 +1,7 @@
 import { FC, useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import LandingHeader from "./LandingHeader";
+import CustomCursor from "./CustomCursor";
 import './LandingPage.css';
 
 /* ──────────────────────────────────────────────────────────────
@@ -399,10 +400,11 @@ const LandingPage: FC = () => {
   };
   return (
     <div 
-      className="lp-root"
+      className="lp-root app-container"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
+      <CustomCursor />
       {/* Dynamic mouse spotlight */}
       <div 
         className={`lp-page-spotlight ${mousePos.isHovered ? 'active' : ''}`}
