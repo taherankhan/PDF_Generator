@@ -1,5 +1,6 @@
 import { FC, useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import LandingHeader from "./LandingHeader";
 import CustomCursor from "./CustomCursor";
 import './LandingPage.css';
@@ -126,6 +127,198 @@ const STATS = [
 /* ═══════════════════════════════════════════════════════════════
    COMPONENT
 ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   USE CASE MICRO MOCKUPS (Framer Motion)
+   ═══════════════════════════════════════════════════════════════ */
+const cardVariants = {
+  initial: { opacity: 0, y: 30 },
+  animate: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring" as const,
+      stiffness: 100,
+      damping: 15,
+      delay: i * 0.12,
+    }
+  }),
+  hover: {
+    y: -6,
+    borderColor: "rgba(108, 99, 255, 0.35)",
+    boxShadow: "0 12px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(108, 99, 255, 0.08)",
+    transition: {
+      type: "spring" as const,
+      stiffness: 400,
+      damping: 25
+    }
+  }
+};
+
+const iconVariants = {
+  hover: {
+    scale: 1.1,
+    rotate: -5,
+    transition: { type: "spring" as const, stiffness: 400, damping: 15 }
+  }
+};
+
+const ResumeMicroVisual: FC = () => (
+  <div className="lp-uc-resume">
+    <div className="lp-uc-resume-header">
+      <motion.div 
+        className="lp-uc-resume-avatar"
+        variants={{
+          hover: { scale: 1.1, backgroundColor: "#6c63ff" }
+        }}
+      />
+      <div className="lp-uc-resume-header-text">
+        <div className="lp-uc-resume-line lp-uc-w-50" />
+        <div className="lp-uc-resume-line lp-uc-w-30" />
+      </div>
+    </div>
+    <div className="lp-uc-resume-body">
+      <div className="lp-uc-resume-row">
+        <div className="lp-uc-resume-line lp-uc-w-80" />
+        <motion.span 
+          className="lp-uc-check-indicator"
+          variants={{
+            initial: { scale: 0, opacity: 0 },
+            hover: { scale: 1, opacity: 1, transition: { delay: 0.15 } }
+          }}
+        >
+          ✓
+        </motion.span>
+      </div>
+      <div className="lp-uc-resume-row">
+        <div className="lp-uc-resume-line lp-uc-w-70" />
+        <motion.span 
+          className="lp-uc-check-indicator"
+          variants={{
+            initial: { scale: 0, opacity: 0 },
+            hover: { scale: 1, opacity: 1, transition: { delay: 0.25 } }
+          }}
+        >
+          ✓
+        </motion.span>
+      </div>
+    </div>
+  </div>
+);
+
+const ChartMicroVisual: FC = () => (
+  <div className="lp-uc-chart">
+    <div className="lp-uc-chart-axis-y" />
+    <div className="lp-uc-chart-bars">
+      {[
+        { hInit: "30%", hHover: "85%", color: "var(--clr-accent)" },
+        { hInit: "45%", hHover: "60%", color: "var(--clr-cyan)" },
+        { hInit: "25%", hHover: "95%", color: "var(--clr-pink)" },
+        { hInit: "55%", hHover: "70%", color: "var(--clr-violet)" },
+      ].map((bar, idx) => (
+        <div key={idx} className="lp-uc-chart-bar-wrapper">
+          <motion.div
+            className="lp-uc-chart-bar"
+            style={{ backgroundColor: bar.color }}
+            variants={{
+              initial: { height: bar.hInit },
+              hover: { 
+                height: bar.hHover,
+                transition: { type: "spring", stiffness: 150, damping: 10, delay: idx * 0.05 } 
+              }
+            }}
+          />
+        </div>
+      ))}
+    </div>
+    <div className="lp-uc-chart-axis-x" />
+  </div>
+);
+
+const ChecklistMicroVisual: FC = () => (
+  <div className="lp-uc-checklist">
+    {[
+      { text: "Math exam formulas", checked: true },
+      { text: "React hooks cheat-sheet", checked: true },
+      { text: "Lecture 4 slide deck notes", checked: false },
+    ].map((item, idx) => (
+      <div key={idx} className="lp-uc-checklist-row">
+        <motion.div 
+          className="lp-uc-checkbox"
+          variants={{
+            hover: { borderColor: "var(--clr-pink)" }
+          }}
+        >
+          {item.checked && (
+            <motion.span 
+              className="lp-uc-checkmark"
+              variants={{
+                initial: { scale: 0, opacity: 0 },
+                hover: { scale: 1, opacity: 1, transition: { delay: idx * 0.1 } }
+              }}
+            >
+              ✓
+            </motion.span>
+          )}
+        </motion.div>
+        <motion.span 
+          className="lp-uc-checklist-text"
+          variants={{
+            hover: item.checked ? { 
+              opacity: 0.5, 
+              textDecoration: "line-through",
+              transition: { delay: idx * 0.1 } 
+            } : {}
+          }}
+        >
+          {item.text}
+        </motion.span>
+      </div>
+    ))}
+  </div>
+);
+
+const ContractMicroVisual: FC = () => (
+  <div className="lp-uc-contract">
+    <div className="lp-uc-contract-body">
+      <div className="lp-uc-contract-line lp-uc-w-90" />
+      <div className="lp-uc-contract-line lp-uc-w-80" />
+      <div className="lp-uc-contract-line lp-uc-w-85" />
+      <div className="lp-uc-contract-sig-line">
+        <svg className="lp-uc-contract-svg" viewBox="0 0 100 30">
+          <motion.path
+            d="M 5,20 C 15,10 20,5 30,18 C 40,30 45,5 55,15 C 65,25 70,5 85,20 C 90,25 95,22 98,18"
+            fill="none"
+            stroke="var(--clr-amber)"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            variants={{
+              initial: { pathLength: 0 },
+              hover: { 
+                pathLength: 1.05, 
+                transition: { duration: 0.8, ease: "easeInOut", delay: 0.1 } 
+              }
+            }}
+          />
+        </svg>
+      </div>
+    </div>
+    <motion.div 
+      className="lp-uc-contract-stamp"
+      variants={{
+        initial: { scale: 2, opacity: 0, rotate: 15 },
+        hover: { 
+          scale: 1, 
+          opacity: 1, 
+          rotate: -12,
+          transition: { type: "spring", stiffness: 300, damping: 14, delay: 0.7 } 
+        }
+      }}
+    >
+      APPROVED
+    </motion.div>
+  </div>
+);
+
 const HERO_WORDS = [
   'Beautiful PDFs',
   'Polished Resumes',
@@ -743,8 +936,8 @@ const LandingPage: FC = () => {
 
       {/* ══════════════════════ USE CASES ══════════════════════ */}
       <section id="lp-usecases" className="lp-section">
-        <div className="lp-section-inner">
-          <div className="lp-split-header lp-reveal">
+        <div className="lp-usecases-section-inner">
+          <div className="lp-usecases-header-col lp-reveal">
             <div className="lp-section-label">Use Cases</div>
             <h2 className="lp-section-title">Built for Real-World<br />Workflows</h2>
             <p className="lp-section-desc">
@@ -754,23 +947,48 @@ const LandingPage: FC = () => {
           </div>
 
           {/* Use Cases 2x2 Grid */}
-          <div className="lp-usecases-grid-new lp-reveal">
-            {USE_CASES.map((uc) => (
-              <div key={uc.title} className="lp-usecase-card-new">
+          <motion.div 
+            className="lp-usecases-grid-new"
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true, margin: "-80px" }}
+          >
+            {USE_CASES.map((uc, i) => (
+              <motion.div 
+                key={uc.title} 
+                className="lp-usecase-card-new"
+                variants={cardVariants}
+                custom={i}
+                whileHover="hover"
+              >
                 <div className="lp-usecase-card-header">
-                  <div className={`lp-usecase-icon-new ${uc.cls}`}>{uc.icon}</div>
+                  <motion.div 
+                    className={`lp-usecase-icon-new ${uc.cls}`}
+                    variants={iconVariants}
+                  >
+                    {uc.icon}
+                  </motion.div>
                   <span className="lp-usecase-num-new">{uc.num}</span>
                 </div>
                 <div className="lp-usecase-card-body">
                   <h3 className="lp-usecase-title-new">{uc.title}</h3>
                   <p className="lp-usecase-desc-new">{uc.desc}</p>
                 </div>
+                
+                {/* Custom Interactive Mockup Visualizations */}
+                <div className="lp-uc-visual-container">
+                  {uc.num === '01' && <ResumeMicroVisual />}
+                  {uc.num === '02' && <ChartMicroVisual />}
+                  {uc.num === '03' && <ChecklistMicroVisual />}
+                  {uc.num === '04' && <ContractMicroVisual />}
+                </div>
+
                 <div className="lp-usecase-card-footer">
                   <span className="lp-usecase-tag-new">{uc.tag}</span>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 

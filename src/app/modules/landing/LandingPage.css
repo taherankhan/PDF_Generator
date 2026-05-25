@@ -1295,11 +1295,25 @@ html { scroll-behavior: smooth; }
 /* ════════════════════════════════════════════════════════════
    USE CASES GRID
    ════════════════════════════════════════════════════════════ */
+.lp-usecases-section-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 48px;
+  align-items: flex-start;
+}
+
+.lp-usecases-header-col {
+  position: sticky;
+  top: 100px;
+  text-align: left;
+}
+
 .lp-usecases-grid-new {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
-  margin-top: 24px;
 }
 
 .lp-usecase-card-new {
@@ -1310,10 +1324,212 @@ html { scroll-behavior: smooth; }
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 200px;
+  min-height: 320px;
   position: relative;
   overflow: hidden;
   transition: var(--transition);
+}
+
+.lp-uc-visual-container {
+  height: 120px;
+  width: 100%;
+  border-radius: var(--radius-md);
+  background: var(--clr-surface2);
+  border: 1px solid var(--clr-border);
+  margin: 16px 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* 1. Resume micro visual */
+.lp-uc-resume {
+  width: 85%;
+  height: 80%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+  padding: 12px;
+  background: rgba(255,255,255,0.02);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--clr-border);
+}
+.lp-uc-resume-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.lp-uc-resume-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #334155;
+}
+.lp-uc-resume-header-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.lp-uc-resume-line {
+  height: 4px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+}
+.lp-uc-resume-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.lp-uc-w-50 { width: 50%; }
+.lp-uc-w-30 { width: 30%; }
+.lp-uc-w-70 { width: 70%; }
+.lp-uc-w-80 { width: 80%; }
+.lp-uc-w-85 { width: 85%; }
+.lp-uc-w-90 { width: 90%; }
+.lp-uc-check-indicator {
+  color: var(--clr-green);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* 2. Chart micro visual */
+.lp-uc-chart {
+  width: 85%;
+  height: 80%;
+  display: flex;
+  align-items: flex-end;
+  position: relative;
+  padding: 0 10px 10px;
+}
+.lp-uc-chart-axis-y {
+  position: absolute;
+  left: 6px;
+  top: 0;
+  bottom: 10px;
+  width: 1px;
+  background: rgba(255,255,255,0.08);
+}
+.lp-uc-chart-axis-x {
+  position: absolute;
+  left: 6px;
+  right: 0;
+  bottom: 9px;
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+}
+.lp-uc-chart-bars {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  padding-left: 8px;
+}
+.lp-uc-chart-bar-wrapper {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.lp-uc-chart-bar {
+  width: 14px;
+  border-radius: 4px 4px 0 0;
+}
+
+/* 3. Checklist micro visual */
+.lp-uc-checklist {
+  width: 85%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+.lp-uc-checklist-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.lp-uc-checkbox {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  color: var(--clr-pink);
+  flex-shrink: 0;
+}
+.lp-uc-checkmark {
+  font-weight: 700;
+  line-height: 1;
+}
+.lp-uc-checklist-text {
+  font-size: 11px;
+  color: var(--clr-muted);
+  font-family: 'Fira Code', monospace;
+}
+
+/* 4. Contract micro visual */
+.lp-uc-contract {
+  width: 85%;
+  height: 80%;
+  background: rgba(255,255,255,0.01);
+  border: 1px solid var(--clr-border);
+  border-radius: 6px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  text-align: left;
+}
+.lp-uc-contract-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+.lp-uc-contract-line {
+  height: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 1.5px;
+}
+.lp-uc-contract-sig-line {
+  border-top: 1px solid rgba(255,255,255,0.12);
+  margin-top: auto;
+  padding-top: 2px;
+  height: 24px;
+  position: relative;
+}
+.lp-uc-contract-svg {
+  position: absolute;
+  top: -8px;
+  left: 6px;
+  width: 80px;
+  height: 30px;
+  pointer-events: none;
+}
+.lp-uc-contract-stamp {
+  position: absolute;
+  right: 6px;
+  top: 10px;
+  border: 1.5px dashed rgba(245,158,11,0.5);
+  padding: 2px 5px;
+  border-radius: 4px;
+  color: var(--clr-amber);
+  font-size: 9px;
+  font-weight: 900;
+  transform: rotate(15deg);
+  letter-spacing: 0.5px;
+  pointer-events: none;
 }
 
 .lp-usecase-card-new::before {
@@ -1437,7 +1653,10 @@ html { scroll-behavior: smooth; }
      linear-gradient(#fff 0 0) content-box, 
      linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
-          mask-composite: exclude;
+  mask: 
+     linear-gradient(#fff 0 0) content-box, 
+     linear-gradient(#fff 0 0);
+  mask-composite: exclude;
   pointer-events: none;
 }
 
@@ -1935,6 +2154,13 @@ html { scroll-behavior: smooth; }
   .lp-footer-top {
     grid-template-columns: 1fr 1fr;
   }
+  .lp-usecases-section-inner {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .lp-usecases-header-col {
+    position: static;
+  }
 }
 
 @media (max-width: 768px) {
@@ -2000,3 +2226,4 @@ html { scroll-behavior: smooth; }
   .lp-hero-actions { flex-direction: column; width: 100%; }
   .lp-btn-primary, .lp-btn-ghost { width: 100%; justify-content: center; }
 }
+

@@ -42,36 +42,23 @@
   mix-blend-mode: difference;
 }
 
-/* Hides default browser cursor for the application container */
-.app-container {
+/* Hides default browser cursor for the application container when custom cursor is active */
+body.has-custom-cursor,
+body.has-custom-cursor .app-container {
   cursor: none !important;
 }
 
 /* Hides default browser cursor for interactive elements within the container */
-.app-container a,
-.app-container button,
-.app-container select,
-.app-container input,
-.app-container textarea,
-.app-container [role="button"],
-.app-container label,
-.app-container .lp-theme-row-btn,
-.app-container .lp-workflow-tab-btn,
-.app-container .lp-bento-theme-bubble,
-.app-container .lp-social-btn {
+body.has-custom-cursor a,
+body.has-custom-cursor button,
+body.has-custom-cursor select,
+body.has-custom-cursor input,
+body.has-custom-cursor textarea,
+body.has-custom-cursor [role="button"],
+body.has-custom-cursor label,
+body.has-custom-cursor .lp-theme-row-btn,
+body.has-custom-cursor .lp-workflow-tab-btn,
+body.has-custom-cursor .lp-bento-theme-bubble,
+body.has-custom-cursor .lp-social-btn {
   cursor: none !important;
-}
-
-/* Hides custom cursor on touch devices natively */
-@media (hover: none) and (pointer: coarse) {
-  .app-container,
-  .app-container a,
-  .app-container button,
-  .app-container select,
-  .app-container input,
-  .app-container textarea,
-  .app-container [role="button"],
-  .app-container label {
-    cursor: auto !important;
-  }
 }

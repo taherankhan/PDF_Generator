@@ -10,21 +10,26 @@ const CustomCursor: FC = () => {
   const [isTouchDevice, setIsTouchDevice] = useState(false);
 
   useEffect(() => {
-    // Detect touchscreen devices to disable custom cursor on mobile
-    const checkTouch = () => {
-      const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      setIsTouchDevice(hasTouch);
-    };
-    checkTouch();
-
-    // 1. Track cursor movement
-    const updateMousePosition = (e: MouseEvent) => {
+    // 1. Track cursor movement and pointer type dynamically
+    const updateMousePosition = (e: PointerEvent) => {
+      // If the input device is touch, we disable the custom cursor
+      if (e.pointerType === 'touch') {
+        setIsTouchDevice(true);
+        setIsVisible(false);
+        return;
+      }
+      
+      // If it's a mouse/pen, enable the custom cursor
+      setIsTouchDevice(false);
+      setIsVisible(true);
       setMousePosition({ x: e.clientX, y: e.clientY });
-      if (!isVisible) setIsVisible(true);
     };
 
-    // 2. Track click down/up actions
-    const handleMouseDown = () => setIsClicking(true);
+    // 2. Track click actions (only for pointer events)
+    const handleMouseDown = (e: PointerEvent) => {
+      if (e.pointerType === 'touch') return;
+      setIsClicking(true);
+    };
     const handleMouseUp = () => setIsClicking(false);
 
     // 3. Detect hover on links, buttons, and custom '.cursor-hover' elements
@@ -48,22 +53,36 @@ const CustomCursor: FC = () => {
       setIsHovering(false);
     };
 
-    // Attach event listeners
-    window.addEventListener('mousemove', updateMousePosition);
-    window.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mouseup', handleMouseUp);
+    // Attach pointer/mouse event listeners
+    window.addEventListener('pointermove', updateMousePosition);
+    window.addEventListener('pointerdown', handleMouseDown);
+    window.addEventListener('pointerup', handleMouseUp);
     window.addEventListener('mouseover', handleMouseEnter);
     window.addEventListener('mouseout', handleMouseLeave);
 
     // Cleanup listeners on unmount
     return () => {
-      window.removeEventListener('mousemove', updateMousePosition);
-      window.removeEventListener('mousedown', handleMouseDown);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('pointermove', updateMousePosition);
+      window.removeEventListener('pointerdown', handleMouseDown);
+      window.removeEventListener('pointerup', handleMouseUp);
       window.removeEventListener('mouseover', handleMouseEnter);
       window.removeEventListener('mouseout', handleMouseLeave);
     };
-  }, [isVisible]);
+  }, []);
+
+  // Manage the body class dynamically so the cursor is hidden only when the custom cursor is active
+  useEffect(() => {
+    const shouldShow = isVisible && !isTouchDevice;
+    if (shouldShow) {
+      document.body.classList.add('has-custom-cursor');
+    } else {
+      document.body.classList.remove('has-custom-cursor');
+    }
+
+    return () => {
+      document.body.classList.remove('has-custom-cursor');
+    };
+  }, [isVisible, isTouchDevice]);
 
   if (isTouchDevice || !isVisible) return null;
 
@@ -81,6 +100,7 @@ const CustomCursor: FC = () => {
           type: "spring",
           stiffness: 500,
           damping: 28,
+          mass: 0.2,
         }}
       />
 
@@ -97,6 +117,7 @@ const CustomCursor: FC = () => {
           type: "spring",
           stiffness: 300,
           damping: 20,
+          mass: 0.5,
         }}
       />
 
