@@ -21,12 +21,13 @@
   justify-content: space-between;
   height: 64px;
   padding: 0 24px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(226, 232, 240, 0.8);
   position: relative;
   z-index: 50;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
 }
 
 .toolbar-left, .toolbar-right {
@@ -35,11 +36,18 @@
   gap: 16px;
 }
 
+/* Toolbar Divider */
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(226, 232, 240, 0.8);
+}
+
 /* Toolbar Title */
 .toolbar-title h1 {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #1e293b;
+  color: #0f172a;
   margin: 0;
   display: flex;
   align-items: center;
@@ -48,7 +56,9 @@
 }
 
 .toolbar-title i {
-  color: #3b82f6;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   font-size: 1.25rem;
 }
 
@@ -65,6 +75,7 @@
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   color: #64748b;
+  text-decoration: none;
 }
 
 .btn-icon:hover {
@@ -74,23 +85,63 @@
 }
 
 .btn-icon:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.98);
 }
 
 .btn-icon i {
   font-size: 1.25rem;
 }
 
-/* Share link button: icon + label */
-.share-link-btn {
+/* Back Button */
+.btn-icon.btn-back {
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+}
+
+.btn-icon.btn-back:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+/* Action Buttons (Share, Save Changes, Copy Link) */
+.btn-icon.share-link-btn,
+.btn-icon.save-changes-btn {
   width: auto;
   min-width: 40px;
-  padding: 0 12px;
-  gap: 6px;
+  padding: 0 16px;
+  gap: 8px;
 }
+
+/* Save Changes button styling */
+.btn-icon.save-changes-btn {
+  background: rgba(16, 185, 129, 0.08); /* Soft emerald background */
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: #059669; /* Emerald text */
+}
+
+.btn-icon.save-changes-btn:hover {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #047857;
+}
+
+/* Copy Link button styling */
+.btn-icon.share-link-btn {
+  background: rgba(59, 130, 246, 0.08); /* Soft blue background */
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: #2563eb; /* Blue text */
+}
+
+.btn-icon.share-link-btn:hover {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #1d4ed8;
+}
+
 .share-link-label {
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   color: inherit;
 }
 
@@ -197,14 +248,28 @@
     background: #0f172a;
   }
 
-  .editor-toolbar,
+  .editor-toolbar {
+    background: rgba(15, 23, 42, 0.8);
+    border-color: rgba(51, 65, 85, 0.5);
+  }
+
   .editor-tabs {
     background: #1e293b;
     border-color: #334155;
   }
 
+  .toolbar-divider {
+    background: rgba(51, 65, 85, 0.5);
+  }
+
   .toolbar-title h1 {
     color: #f1f5f9;
+  }
+
+  .toolbar-title i {
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   .toolbar-subtitle {
@@ -212,15 +277,49 @@
   }
 
   .btn-icon {
-    background: #1e293b;
-    border-color: #334155;
+    background: transparent;
+    border-color: transparent;
     color: #94a3b8;
   }
 
   .btn-icon:hover {
-    background: #334155;
+    background: rgba(51, 65, 85, 0.5);
+    border-color: transparent;
+    color: #f1f5f9;
+  }
+
+  .btn-icon.btn-back {
+    border-color: rgba(51, 65, 85, 0.8);
+    background: rgba(30, 41, 59, 0.5);
+  }
+
+  .btn-icon.btn-back:hover {
+    background: rgba(51, 65, 85, 0.8);
     border-color: #475569;
     color: #f1f5f9;
+  }
+
+  /* Share & Save Changes dark mode overrides */
+  .btn-icon.save-changes-btn {
+    background: rgba(52, 211, 153, 0.1);
+    border-color: rgba(52, 211, 153, 0.2);
+    color: #34d399;
+  }
+  .btn-icon.save-changes-btn:hover {
+    background: rgba(52, 211, 153, 0.2);
+    border-color: rgba(52, 211, 153, 0.4);
+    color: #6ee7b7;
+  }
+
+  .btn-icon.share-link-btn {
+    background: rgba(96, 165, 250, 0.1);
+    border-color: rgba(96, 165, 250, 0.2);
+    color: #60a5fa;
+  }
+  .btn-icon.share-link-btn:hover {
+    background: rgba(96, 165, 250, 0.2);
+    border-color: rgba(96, 165, 250, 0.4);
+    color: #93c5fd;
   }
 
   .view-toggle {

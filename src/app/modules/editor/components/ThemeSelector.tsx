@@ -84,21 +84,27 @@ const ThemeSelector: FC<ThemeSelectorProps> = ({ selectedTheme, onThemeChange })
                     display: flex;
                     align-items: center;
                     gap: 8px;
-                    padding: 8px 16px;
-                    border-radius: 8px;
-                    border: 1px solid #e5e7eb;
+                    height: 40px;
+                    padding: 0 16px;
+                    border-radius: 10px;
+                    border: 1px solid #e2e8f0;
                     background: white;
                     color: #475569;
                     font-size: 14px;
                     font-weight: 500;
                     cursor: pointer;
-                    transition: all 0.2s ease;
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
                 }
 
                 .btn-theme-toggle:hover {
-                    background: #f8f9fa;
+                    background: #f8fafc;
                     border-color: #cbd5e1;
                     color: #0f172a;
+                    transform: translateY(-1px);
+                }
+
+                .btn-theme-toggle:active {
+                    transform: translateY(0) scale(0.98);
                 }
 
                 .theme-name {
@@ -113,25 +119,25 @@ const ThemeSelector: FC<ThemeSelectorProps> = ({ selectedTheme, onThemeChange })
                     max-height: 280px;
                     overflow-y: auto;
                     background: white;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 8px;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                    border: 1px solid #e2e8f0;
+                    border-radius: 10px;
+                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
                     z-index: 1000;
-                    padding: 4px;
+                    padding: 6px;
                 }
 
                 .theme-option {
                     display: flex;
                     align-items: center;
                     gap: 10px;
-                    padding: 8px 10px;
-                    border-radius: 6px;
+                    padding: 8px 12px;
+                    border-radius: 8px;
                     cursor: pointer;
                     transition: all 0.15s ease;
                 }
 
                 .theme-option:hover {
-                    background: #f8f9fa;
+                    background: #f1f5f9;
                 }
 
                 .theme-option.active {
@@ -185,6 +191,7 @@ const ThemeSelector: FC<ThemeSelectorProps> = ({ selectedTheme, onThemeChange })
                     .theme-dropdown-menu {
                         background: #1e293b;
                         border-color: #334155;
+                        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
                     }
 
                     .theme-option:hover {
@@ -192,7 +199,7 @@ const ThemeSelector: FC<ThemeSelectorProps> = ({ selectedTheme, onThemeChange })
                     }
 
                     .theme-option.active {
-                        background: #1e3a5f;
+                        background: rgba(59, 130, 246, 0.15);
                     }
 
                     .theme-option-name {

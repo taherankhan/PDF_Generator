@@ -52,8 +52,9 @@ const ExportButton: FC<ExportButtonProps> = ({ markdown, themeId, previewRef, di
         color: '#ffffff', // Always white text on colored gradient
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         boxShadow: `0 4px 6px -1px ${theme.colors.primary}66`, // Colored shadow
-        padding: '8px 20px',
-        borderRadius: '8px',
+        padding: '0 20px',
+        height: '40px',
+        borderRadius: '10px',
         fontSize: '0.875rem',
         fontWeight: 600,
         cursor: isExporting || disabled ? 'not-allowed' : 'pointer',
@@ -70,14 +71,24 @@ const ExportButton: FC<ExportButtonProps> = ({ markdown, themeId, previewRef, di
             style={buttonStyle}
             onMouseOver={(e) => {
                 if (!isExporting && !disabled) {
-                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.transform = 'translateY(-1px) scale(1.02)';
                     e.currentTarget.style.boxShadow = `0 6px 8px -1px ${theme.colors.primary}88`;
                 }
             }}
             onMouseOut={(e) => {
                 if (!isExporting && !disabled) {
-                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.transform = 'translateY(0) scale(1)';
                     e.currentTarget.style.boxShadow = `0 4px 6px -1px ${theme.colors.primary}66`;
+                }
+            }}
+            onMouseDown={(e) => {
+                if (!isExporting && !disabled) {
+                    e.currentTarget.style.transform = 'translateY(0) scale(0.98)';
+                }
+            }}
+            onMouseUp={(e) => {
+                if (!isExporting && !disabled) {
+                    e.currentTarget.style.transform = 'translateY(-1px) scale(1.02)';
                 }
             }}
         >
