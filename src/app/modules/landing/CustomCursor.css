@@ -7,11 +7,18 @@
   left: 0;
   width: 16px;
   height: 16px;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.95);
   border-radius: 50%;
   pointer-events: none;
   z-index: 9999;
-  mix-blend-mode: difference;
+  will-change: transform;
+  box-shadow: 0 0 12px rgba(108, 99, 255, 0.45);
+}
+
+.custom-cursor-dot--hidden,
+.custom-cursor-ring--hidden {
+  opacity: 0;
+  visibility: hidden;
 }
 
 /* Outer trailing ring styling */
@@ -21,11 +28,11 @@
   left: 0;
   width: 32px;
   height: 32px;
-  border: 1px solid white;
+  border: 1px solid rgba(255, 255, 255, 0.85);
   border-radius: 50%;
   pointer-events: none;
   z-index: 9998;
-  mix-blend-mode: difference;
+  will-change: transform, opacity;
 }
 
 /* Expanding click wave ring */
@@ -35,11 +42,12 @@
   left: 0;
   width: 64px;
   height: 64px;
-  border: 2px solid white;
+  border: 2px solid rgba(255, 255, 255, 0.85);
   border-radius: 50%;
   pointer-events: none;
   z-index: 9996;
-  mix-blend-mode: difference;
+  opacity: 0;
+  visibility: hidden;
 }
 
 /* Hides default browser cursor for the application container when custom cursor is active */
@@ -57,8 +65,7 @@ body.has-custom-cursor textarea,
 body.has-custom-cursor [role="button"],
 body.has-custom-cursor label,
 body.has-custom-cursor .lp-theme-row-btn,
-body.has-custom-cursor .lp-workflow-tab-btn,
 body.has-custom-cursor .lp-bento-theme-bubble,
-body.has-custom-cursor .lp-social-btn {
+body.has-custom-cursor .lp-footer-dev-btn {
   cursor: none !important;
 }

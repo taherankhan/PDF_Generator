@@ -1,26 +1,44 @@
 import ReactGA from 'react-ga4';
 
 const ANALYTICS_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
+const IS_DEV = import.meta.env.DEV;
+
+const log = (...args: unknown[]) => {
+  if (IS_DEV) console.log('[Analytics]', ...args);
+};
 
 export const AnalyticsService = {
+  isEnabled: () => Boolean(ANALYTICS_ID),
+
   initialize: () => {
-    if (ANALYTICS_ID) {
-      ReactGA.initialize(ANALYTICS_ID);
-      console.log('Google Analytics initialized');
-    } else {
-      console.warn('Google Analytics Measurement ID not found in environment variables.');
+    if (!ANALYTICS_ID) {
+      if (IS_DEV) {
+        console.warn(
+          'Google Analytics disabled: set VITE_GA_MEASUREMENT_ID in .env (format G-XXXXXXXXXX)'
+        );
+      }
+      return;
     }
+
+    ReactGA.initialize(ANALYTICS_ID);
+    log('initialized', ANALYTICS_ID);
   },
 
-  trackPageView: (path: string) => {
-    console.log(`[Analytics] Page View: ${path}`);
+  trackPageView: (path: string, title?: string) => {
+    log('pageview', path, title);
     if (!ANALYTICS_ID) return;
-    ReactGA.send({ hitType: "pageview", page: path });
+
+    ReactGA.send({
+      hitType: 'pageview',
+      page: path,
+      title: title ?? document.title,
+    });
   },
 
   trackEvent: (category: string, action: string, label?: string) => {
-    console.log(`[Analytics] Event: ${category} - ${action} ${label ? `(${label})` : ''}`);
+    log('event', category, action, label);
     if (!ANALYTICS_ID) return;
+
     ReactGA.event({
       category,
       action,
@@ -28,7 +46,6 @@ export const AnalyticsService = {
     });
   },
 
-  // Specific events for type safety and consistency
   events: {
     exportPDF: (theme: string, chars: number) => {
       AnalyticsService.trackEvent('Export', 'Download PDF', `Theme: ${theme}, Length: ${chars}`);
@@ -37,10 +54,28 @@ export const AnalyticsService = {
       AnalyticsService.trackEvent('Appearance', 'Change Theme', theme);
     },
     toggleFullScreen: (pane: string, state: boolean) => {
-      AnalyticsService.trackEvent('UI', 'Toggle Fullscreen', `${pane} ${state ? 'maximized' : 'restored'}`);
+      AnalyticsService.trackEvent(
+        'UI',
+        'Toggle Fullscreen',
+        `${pane} ${state ? 'maximized' : 'restored'}`
+      );
     },
     uploadFile: (fileType: string) => {
-        AnalyticsService.trackEvent('Content', 'Upload File', fileType);
-    }
-  }
+      AnalyticsService.trackEvent('Content', 'Upload File', fileType);
+    },
+
+    /** Landing page */
+    landingCta: (location: string) => {
+      AnalyticsService.trackEvent('Landing', 'CTA Click', location);
+    },
+    landingNav: (sectionId: string) => {
+      AnalyticsService.trackEvent('Landing', 'Nav Scroll', sectionId);
+    },
+    landingThemePreview: (themeName: string) => {
+      AnalyticsService.trackEvent('Landing', 'Theme Preview', themeName);
+    },
+    landingContactSubmit: () => {
+      AnalyticsService.trackEvent('Landing', 'Contact Form', 'submit_success');
+    },
+  },
 };

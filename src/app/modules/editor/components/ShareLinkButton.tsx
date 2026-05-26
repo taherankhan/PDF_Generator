@@ -11,7 +11,7 @@ import {
 interface ShareLinkButtonProps {
   payload: SharePayload;
   shareId?: string;
-  onShareIdChange?: (id: string) => void;
+  onShareIdChange?: (id: string, options?: { skipLoad?: boolean }) => void;
   onSaveSuccess?: (content: string, theme: string) => void;
 }
 
@@ -31,7 +31,7 @@ const ShareLinkButton: FC<ShareLinkButtonProps> = ({ payload, shareId, onShareId
       setCopied(true);
       
       if (onShareIdChange) {
-        onShareIdChange(id);
+        onShareIdChange(id, { skipLoad: true });
       }
       if (onSaveSuccess) {
         onSaveSuccess(payload.content, payload.theme || "professional");

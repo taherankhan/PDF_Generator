@@ -10,6 +10,7 @@ import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { PrivateRoutes } from "./PrivateRoutes";
 import { ErrorsPage } from "../modules/errors/ErrorsPage";
 import { App } from "../App";
+import PageTracker from "./PageTracker";
 
 /**
  * Base URL of the website.
@@ -21,6 +22,7 @@ const { BASE_URL } = import.meta.env;
 const AppRoutes: FC = () => {
   return (
     <BrowserRouter basename={BASE_URL}>
+      <PageTracker />
       <Routes>
         <Route element={<App />}>
           <Route

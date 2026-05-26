@@ -1,5 +1,4 @@
 import { FC, ChangeEvent } from 'react';
-import { KTIcon } from '../../../../admin/helpers';
 
 interface MarkdownEditorProps {
     value: string;
@@ -13,55 +12,40 @@ const MarkdownEditor: FC<MarkdownEditorProps> = ({ value, onChange, isFullScreen
         onChange(e.target.value);
     };
 
-    const insertMarkdown = (before: string, after: string = '') => {
-        const textarea = document.querySelector('textarea') as HTMLTextAreaElement;
-        if (!textarea) return;
-
-        const start = textarea.selectionStart;
-        const end = textarea.selectionEnd;
-        const selectedText = value.substring(start, end);
-        const newText = value.substring(0, start) + before + selectedText + after + value.substring(end);
-
-        onChange(newText);
-
-        // Set cursor position after insertion
-        setTimeout(() => {
-            textarea.focus();
-            textarea.setSelectionRange(start + before.length, start + before.length + selectedText.length);
-        }, 0);
-    };
+    const wordCount = value.split(/\s+/).filter(Boolean).length;
+    const lineCount = value.split('\n').length;
 
     return (
         <div className="h-100 d-flex flex-column">
-            <div className="d-flex justify-content-end align-items-center mb-2 px-3 pt-2 text-muted small flex-shrink-0">
-                <div className="d-flex align-items-center me-3">
-                    <span>{value.length} chars</span>
-                    <span className="mx-2">•</span>
-                    <span>{value.split(/\s+/).filter(Boolean).length} words</span>
-                    <span className="mx-2">•</span>
-                    <span>{value.split('\n').length} lines</span>
+            <div className="editor-pane-header">
+                <div className="editor-pane-label">
+                    <i className="bi bi-markdown"></i>
+                    Editor
                 </div>
-                {onToggleFullScreen && (
-                    <button
-                        className="btn btn-sm btn-icon-small"
-                        onClick={onToggleFullScreen}
-                        title={isFullScreen ? "Exit Full Screen" : "Full Screen"}
-                        style={{ width: '24px', height: '24px', padding: 0 }}
-                    >
-                        <i className={`bi ${isFullScreen ? 'bi-fullscreen-exit' : 'bi-arrows-fullscreen'}`}></i>
-                    </button>
-                )}
+                <div className="d-flex align-items-center gap-2">
+                    <div className="editor-pane-stats">
+                        <span>{value.length} chars</span>
+                        <span>{wordCount} words</span>
+                        <span>{lineCount} lines</span>
+                    </div>
+                    {onToggleFullScreen && (
+                        <button
+                            className="btn-pane-action"
+                            onClick={onToggleFullScreen}
+                            title={isFullScreen ? 'Exit Full Screen' : 'Full Screen'}
+                            type="button"
+                        >
+                            <i className={`bi ${isFullScreen ? 'bi-fullscreen-exit' : 'bi-arrows-fullscreen'}`}></i>
+                        </button>
+                    )}
+                </div>
             </div>
-            <textarea
-                className="form-control font-monospace flex-grow-1 border-0 rounded-0 p-3"
-                style={{
-                    resize: 'none',
-                    fontSize: '14px',
-                    lineHeight: '1.6',
-                }}
-                value={value}
-                onChange={handleChange}
-                placeholder="# Start writing your markdown here...
+            <div className="editor-textarea-wrap">
+                <textarea
+                    className="editor-textarea"
+                    value={value}
+                    onChange={handleChange}
+                    placeholder="# Start writing your markdown here...
 
 ## Features
 - **Bold text**
@@ -72,9 +56,10 @@ const MarkdownEditor: FC<MarkdownEditorProps> = ({ value, onChange, isFullScreen
 
 ```javascript
 console.log('Hello, World!');
-```
-"
-            />
+```"
+                    spellCheck={false}
+                />
+            </div>
         </div>
     );
 };

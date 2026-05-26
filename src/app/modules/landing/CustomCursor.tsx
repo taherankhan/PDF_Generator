@@ -1,143 +1,140 @@
-import { FC, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { FC, useEffect, useRef } from 'react';
+import { usePrefersReducedMotion } from './hooks/usePrefersReducedMotion';
 import './CustomCursor.css';
 
+const INTERACTIVE_SELECTOR =
+  'button, a, select, input, textarea, [role="button"], label, .cursor-hover, .lp-theme-row-btn, .lp-bento-theme-bubble, .lp-footer-dev-btn';
+
+const OFFSCREEN = -9999;
+
 const CustomCursor: FC = () => {
-  const [mousePosition, setMousePosition] = useState({ x: -100, y: -100 });
-  const [isHovering, setIsHovering] = useState(false);
-  const [isClicking, setIsClicking] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const reducedMotion = usePrefersReducedMotion();
+  const dotRef = useRef<HTMLDivElement>(null);
+  const ringRef = useRef<HTMLDivElement>(null);
+  const clickRef = useRef<HTMLDivElement>(null);
+  const posRef = useRef({ x: OFFSCREEN, y: OFFSCREEN });
+  const ringPosRef = useRef({ x: OFFSCREEN, y: OFFSCREEN });
+  const hoveringRef = useRef(false);
+  const visibleRef = useRef(false);
+  const rafRef = useRef(0);
 
   useEffect(() => {
-    // 1. Track cursor movement and pointer type dynamically
-    const updateMousePosition = (e: PointerEvent) => {
-      // If the input device is touch, we disable the custom cursor
+    if (reducedMotion) return;
+
+    const dot = dotRef.current;
+    const ring = ringRef.current;
+    const click = clickRef.current;
+    if (!dot || !ring || !click) return;
+
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+    const applyTransforms = () => {
+      const scale = hoveringRef.current ? 1.5 : 1;
+      const ringScale = hoveringRef.current ? 2.2 : 1.15;
+
+      dot.style.transform = `translate3d(${posRef.current.x - 8}px, ${posRef.current.y - 8}px, 0) scale(${scale})`;
+      ring.style.transform = `translate3d(${ringPosRef.current.x - 16}px, ${ringPosRef.current.y - 16}px, 0) scale(${ringScale})`;
+      ring.style.opacity = hoveringRef.current ? '0.55' : '0.35';
+    };
+
+    const show = () => {
+      if (visibleRef.current) return;
+      visibleRef.current = true;
+      dot.classList.remove('custom-cursor-dot--hidden');
+      ring.classList.remove('custom-cursor-ring--hidden');
+      document.body.classList.add('has-custom-cursor');
+    };
+
+    const hide = () => {
+      if (!visibleRef.current) return;
+      visibleRef.current = false;
+      dot.classList.add('custom-cursor-dot--hidden');
+      ring.classList.add('custom-cursor-ring--hidden');
+      document.body.classList.remove('has-custom-cursor');
+      posRef.current = { x: OFFSCREEN, y: OFFSCREEN };
+      ringPosRef.current = { x: OFFSCREEN, y: OFFSCREEN };
+      applyTransforms();
+    };
+
+    const tick = () => {
+      if (visibleRef.current) {
+        ringPosRef.current.x = lerp(ringPosRef.current.x, posRef.current.x, 0.18);
+        ringPosRef.current.y = lerp(ringPosRef.current.y, posRef.current.y, 0.18);
+        applyTransforms();
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
       if (e.pointerType === 'touch') {
-        setIsTouchDevice(true);
-        setIsVisible(false);
+        hide();
         return;
       }
-      
-      // If it's a mouse/pen, enable the custom cursor
-      setIsTouchDevice(false);
-      setIsVisible(true);
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
 
-    // 2. Track click actions (only for pointer events)
-    const handleMouseDown = (e: PointerEvent) => {
-      if (e.pointerType === 'touch') return;
-      setIsClicking(true);
-    };
-    const handleMouseUp = () => setIsClicking(false);
+      const { clientX: x, clientY: y } = e;
 
-    // 3. Detect hover on links, buttons, and custom '.cursor-hover' elements
-    const handleMouseEnter = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target) return;
-
-      if (
-        target.tagName === 'BUTTON' || 
-        target.tagName === 'A' || 
-        target.closest('button') || 
-        target.closest('a') ||
-        target.classList.contains('cursor-hover') ||
-        target.closest('.cursor-hover')
-      ) {
-        setIsHovering(true);
+      if (!visibleRef.current) {
+        posRef.current = { x, y };
+        ringPosRef.current = { x, y };
+        applyTransforms();
+        show();
+      } else {
+        posRef.current = { x, y };
       }
     };
 
-    const handleMouseLeave = () => {
-      setIsHovering(false);
+    const onPointerDown = (e: PointerEvent) => {
+      if (e.pointerType === 'touch' || !visibleRef.current) return;
+
+      click.style.transition = 'none';
+      click.style.transform = `translate3d(${e.clientX - 32}px, ${e.clientY - 32}px, 0) scale(0)`;
+      click.style.opacity = '1';
+
+      requestAnimationFrame(() => {
+        click.style.transition = 'transform 0.4s ease-out, opacity 0.4s ease-out';
+        click.style.transform = `translate3d(${e.clientX - 32}px, ${e.clientY - 32}px, 0) scale(2)`;
+        click.style.opacity = '0';
+      });
     };
 
-    // Attach pointer/mouse event listeners
-    window.addEventListener('pointermove', updateMousePosition);
-    window.addEventListener('pointerdown', handleMouseDown);
-    window.addEventListener('pointerup', handleMouseUp);
-    window.addEventListener('mouseover', handleMouseEnter);
-    window.addEventListener('mouseout', handleMouseLeave);
+    const onPointerOver = (e: PointerEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      hoveringRef.current = !!target.closest(INTERACTIVE_SELECTOR);
+    };
 
-    // Cleanup listeners on unmount
+    const onPointerLeave = (e: PointerEvent) => {
+      if (e.pointerType === 'touch') return;
+      if (e.target === document.documentElement) {
+        hide();
+      }
+    };
+
+    applyTransforms();
+    rafRef.current = requestAnimationFrame(tick);
+
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('pointerdown', onPointerDown, { passive: true });
+    window.addEventListener('pointerover', onPointerOver, { passive: true });
+    document.documentElement.addEventListener('pointerleave', onPointerLeave);
+
     return () => {
-      window.removeEventListener('pointermove', updateMousePosition);
-      window.removeEventListener('pointerdown', handleMouseDown);
-      window.removeEventListener('pointerup', handleMouseUp);
-      window.removeEventListener('mouseover', handleMouseEnter);
-      window.removeEventListener('mouseout', handleMouseLeave);
-    };
-  }, []);
-
-  // Manage the body class dynamically so the cursor is hidden only when the custom cursor is active
-  useEffect(() => {
-    const shouldShow = isVisible && !isTouchDevice;
-    if (shouldShow) {
-      document.body.classList.add('has-custom-cursor');
-    } else {
-      document.body.classList.remove('has-custom-cursor');
-    }
-
-    return () => {
+      cancelAnimationFrame(rafRef.current);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('pointerover', onPointerOver);
+      document.documentElement.removeEventListener('pointerleave', onPointerLeave);
       document.body.classList.remove('has-custom-cursor');
     };
-  }, [isVisible, isTouchDevice]);
+  }, [reducedMotion]);
 
-  if (isTouchDevice || !isVisible) return null;
+  if (reducedMotion) return null;
 
   return (
     <>
-      {/* 1. Main Cursor Dot */}
-      <motion.div
-        className="custom-cursor-dot"
-        animate={{
-          x: mousePosition.x - 8,
-          y: mousePosition.y - 8,
-          scale: isHovering ? 1.5 : 1,
-        }}
-        transition={{
-          type: "spring",
-          stiffness: 500,
-          damping: 28,
-          mass: 0.2,
-        }}
-      />
-
-      {/* 2. Outer Trailing Ring */}
-      <motion.div
-        className="custom-cursor-ring"
-        animate={{
-          x: mousePosition.x - 16,
-          y: mousePosition.y - 16,
-          scale: isHovering ? 2.5 : 1.2,
-          opacity: isHovering ? 0.6 : 0.4,
-        }}
-        transition={{
-          type: "spring",
-          stiffness: 300,
-          damping: 20,
-          mass: 0.5,
-        }}
-      />
-
-      {/* 3. Click Wave Effect */}
-      {isClicking && (
-        <motion.div
-          className="custom-cursor-click"
-          initial={{ 
-            x: mousePosition.x - 32, 
-            y: mousePosition.y - 32, 
-            scale: 0,
-            opacity: 1 
-          }}
-          animate={{ 
-            scale: 2,
-            opacity: 0 
-          }}
-          transition={{ duration: 0.4 }}
-        />
-      )}
+      <div ref={dotRef} className="custom-cursor-dot custom-cursor-dot--hidden" aria-hidden="true" />
+      <div ref={ringRef} className="custom-cursor-ring custom-cursor-ring--hidden" aria-hidden="true" />
+      <div ref={clickRef} className="custom-cursor-click" aria-hidden="true" />
     </>
   );
 };

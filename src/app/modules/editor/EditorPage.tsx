@@ -1,5 +1,5 @@
 import { FC, useState, useRef, useEffect } from "react";
-import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import MarkdownEditor from "./components/MarkdownEditor";
 import PreviewPane from "./components/PreviewPane";
 import ExportButton from "./components/ExportButton";
@@ -58,7 +58,6 @@ Visit [Google](https://www.google.com) for more information.
 
 const EditorPage: FC = () => {
     const navigate = useNavigate();
-    const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
     const [markdownContent, setMarkdownContent] = useState(defaultMarkdown);
     const [debouncedMarkdown, setDebouncedMarkdown] = useState(defaultMarkdown);
@@ -71,6 +70,9 @@ const EditorPage: FC = () => {
     const markdownRef = useRef(markdownContent);
     const themeRef = useRef(selectedTheme);
     const lastSyncedPayload = useRef({ content: defaultMarkdown, theme: "professional" });
+    const skipShareLoadRef = useRef<string | null>(null);
+    const loadedShareIdsRef = useRef<Set<string>>(new Set());
+    const suppressRemoteUntilRef = useRef(0);
 
     useEffect(() => {
         markdownRef.current = markdownContent;
@@ -80,9 +82,12 @@ const EditorPage: FC = () => {
         themeRef.current = selectedTheme;
     }, [selectedTheme]);
 
-    useEffect(() => {
-        AnalyticsService.trackPageView("/editor");
-    }, []);
+    const notifyRemoteUpdate = (message: string) => {
+        if (Date.now() < suppressRemoteUntilRef.current) return;
+        const toastId = shareId ? `share-remote-${shareId}` : "share-remote";
+        if (toast.isActive(toastId)) return;
+        toast.info(message, { toastId, autoClose: 3000 });
+    };
 
     // Supabase Realtime subscription for live updates
     useEffect(() => {
@@ -99,18 +104,29 @@ const EditorPage: FC = () => {
                     filter: `id=eq.${shareId}`
                 },
                 (payload) => {
-                    if (payload.new) {
-                        const newContent = payload.new.content;
-                        const newTheme = payload.new.theme;
-                        const hasChanges = newContent !== markdownRef.current || newTheme !== themeRef.current;
-                        
-                        if (hasChanges) {
-                            setMarkdownContent(newContent);
-                            if (newTheme) setSelectedTheme(newTheme);
-                            lastSyncedPayload.current = { content: newContent, theme: newTheme || "professional" };
-                            toast.info("Document updated live by another user!");
-                        }
+                    if (!payload.new) return;
+
+                    const newContent = payload.new.content as string;
+                    const newTheme = (payload.new.theme as string) || "professional";
+
+                    if (Date.now() < suppressRemoteUntilRef.current) {
+                        lastSyncedPayload.current = { content: newContent, theme: newTheme };
+                        return;
                     }
+
+                    const matchesSynced =
+                        newContent === lastSyncedPayload.current.content &&
+                        newTheme === lastSyncedPayload.current.theme;
+                    const matchesLocal =
+                        newContent === markdownRef.current &&
+                        newTheme === themeRef.current;
+
+                    if (matchesSynced || matchesLocal) return;
+
+                    setMarkdownContent(newContent);
+                    setSelectedTheme(newTheme);
+                    lastSyncedPayload.current = { content: newContent, theme: newTheme };
+                    notifyRemoteUpdate("Document updated live by another user!");
                 }
             )
             .subscribe();
@@ -120,7 +136,7 @@ const EditorPage: FC = () => {
         };
     }, [shareId]);
 
-    // Polling fallback check for live updates (e.g. when database replication is not active)
+    // Polling fallback — silent sync only (realtime handles user-facing toast)
     useEffect(() => {
         if (!shareId) return;
 
@@ -132,20 +148,19 @@ const EditorPage: FC = () => {
                 const isCloudUpdated = payload.content !== lastSyncedPayload.current.content ||
                                       payload.theme !== lastSyncedPayload.current.theme;
 
-                if (isCloudUpdated) {
-                    const hasLocalEdits = markdownRef.current !== lastSyncedPayload.current.content ||
-                                          themeRef.current !== lastSyncedPayload.current.theme;
+                if (!isCloudUpdated) return;
 
-                    if (!hasLocalEdits) {
-                        setMarkdownContent(payload.content);
-                        if (payload.theme) setSelectedTheme(payload.theme);
-                        lastSyncedPayload.current = {
-                            content: payload.content,
-                            theme: payload.theme || "professional"
-                        };
-                        toast.info("Document updated live from cloud!");
-                    }
-                }
+                const hasLocalEdits = markdownRef.current !== lastSyncedPayload.current.content ||
+                                      themeRef.current !== lastSyncedPayload.current.theme;
+
+                if (hasLocalEdits) return;
+
+                setMarkdownContent(payload.content);
+                if (payload.theme) setSelectedTheme(payload.theme);
+                lastSyncedPayload.current = {
+                    content: payload.content,
+                    theme: payload.theme || "professional"
+                };
             } catch (err) {
                 console.error("Error polling for database updates:", err);
             }
@@ -164,60 +179,83 @@ const EditorPage: FC = () => {
         };
     }, [markdownContent]);
 
-    // Hydrate from shared link (Supabase database or legacy hash) on mount
+    // Hydrate from shared link on shareId change (once per id)
     useEffect(() => {
-        const shareId = searchParams.get("share");
-        if (shareId) {
-            const loadSharedDoc = async () => {
-                const loadingToast = toast.loading("Loading document from cloud database...");
-                try {
-                    const payload = await fetchSharePayloadFromDb(shareId);
-                    if (payload) {
-                        setMarkdownContent(payload.content);
-                        if (payload.theme) setSelectedTheme(payload.theme);
-                        lastSyncedPayload.current = {
-                            content: payload.content,
-                            theme: payload.theme || "professional"
-                        };
-                        toast.update(loadingToast, {
-                            render: "Document loaded successfully!",
-                            type: "success",
-                            isLoading: false,
-                            autoClose: 3000
-                        });
-                    } else {
-                        toast.update(loadingToast, {
-                            render: "Could not find document or invalid share ID.",
-                            type: "error",
-                            isLoading: false,
-                            autoClose: 4000
-                        });
-                    }
-                } catch (error) {
-                    console.error("❌ Failed to fetch shared document from Supabase. Check DNS propagation or project status.", error);
-                    toast.update(loadingToast, {
-                        render: "Failed to load document from cloud.",
+        if (!shareId) return;
+
+        if (skipShareLoadRef.current === shareId) {
+            skipShareLoadRef.current = null;
+            loadedShareIdsRef.current.add(shareId);
+            return;
+        }
+
+        if (loadedShareIdsRef.current.has(shareId)) return;
+
+        const toastId = `share-load-${shareId}`;
+        if (toast.isActive(toastId)) return;
+
+        let cancelled = false;
+
+        const loadSharedDoc = async () => {
+            toast.loading("Loading document from cloud database...", { toastId });
+            try {
+                const payload = await fetchSharePayloadFromDb(shareId);
+                if (cancelled) return;
+
+                if (payload) {
+                    setMarkdownContent(payload.content);
+                    if (payload.theme) setSelectedTheme(payload.theme);
+                    lastSyncedPayload.current = {
+                        content: payload.content,
+                        theme: payload.theme || "professional"
+                    };
+                    loadedShareIdsRef.current.add(shareId);
+                    toast.update(toastId, {
+                        render: "Document loaded successfully!",
+                        type: "success",
+                        isLoading: false,
+                        autoClose: 3000
+                    });
+                } else {
+                    toast.update(toastId, {
+                        render: "Could not find document or invalid share ID.",
                         type: "error",
                         isLoading: false,
                         autoClose: 4000
                     });
                 }
-            };
-            loadSharedDoc();
-        } else {
-            // Fallback: Hydrate from legacy shared link hash on mount if present
-            const payload = decodeSharePayload();
-            if (payload) {
-                setMarkdownContent(payload.content);
-                if (payload.theme) setSelectedTheme(payload.theme);
-                lastSyncedPayload.current = {
-                    content: payload.content,
-                    theme: payload.theme || "professional"
-                };
-                toast.info("Opened from legacy shared link.");
+            } catch (error) {
+                if (cancelled) return;
+                console.error("❌ Failed to fetch shared document from Supabase.", error);
+                toast.update(toastId, {
+                    render: "Failed to load document from cloud.",
+                    type: "error",
+                    isLoading: false,
+                    autoClose: 4000
+                });
             }
-        }
-    }, [searchParams, location.hash]);
+        };
+
+        loadSharedDoc();
+        return () => {
+            cancelled = true;
+        };
+    }, [shareId]);
+
+    // Legacy hash links (no share id)
+    useEffect(() => {
+        if (shareId) return;
+        const payload = decodeSharePayload();
+        if (!payload) return;
+
+        setMarkdownContent(payload.content);
+        if (payload.theme) setSelectedTheme(payload.theme);
+        lastSyncedPayload.current = {
+            content: payload.content,
+            theme: payload.theme || "professional"
+        };
+        toast.info("Opened from legacy shared link.");
+    }, [shareId]);
 
     const toggleFullScreen = (pane: 'editor' | 'preview') => {
         setFullScreenPane(current => {
@@ -227,7 +265,10 @@ const EditorPage: FC = () => {
         });
     };
 
-    const handleShareIdChange = (newId: string) => {
+    const handleShareIdChange = (newId: string, options?: { skipLoad?: boolean }) => {
+        if (options?.skipLoad) {
+            skipShareLoadRef.current = newId;
+        }
         setSearchParams({ share: newId });
     };
 
@@ -259,6 +300,7 @@ const EditorPage: FC = () => {
                         onShareIdChange={handleShareIdChange}
                         onSaveSuccess={(savedContent, savedTheme) => {
                             lastSyncedPayload.current = { content: savedContent, theme: savedTheme };
+                            suppressRemoteUntilRef.current = Date.now() + 5000;
                         }}
                     />
                     <ThemeSelector

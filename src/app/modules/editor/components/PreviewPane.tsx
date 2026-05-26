@@ -18,7 +18,6 @@ const PreviewPane = forwardRef<HTMLDivElement, PreviewPaneProps>(({ markdown, th
     const html = parseMarkdown(markdown);
     const themedHtml = applyThemeToHTML(html, theme);
 
-    // Update iframe content when HTML or theme changes
     useEffect(() => {
         const iframe = iframeRef.current;
         if (!iframe) return;
@@ -26,22 +25,16 @@ const PreviewPane = forwardRef<HTMLDivElement, PreviewPaneProps>(({ markdown, th
         const doc = iframe.contentDocument;
         if (!doc) return;
 
-        // Create the full HTML document with styles
         const fullContent = `
             <!DOCTYPE html>
             <html>
             <head>
                 <meta charset="utf-8">
                 <style>
-                    /* Base Reset */
                     body { margin: 0; padding: 0; overflow-x: hidden; }
-                    /* Prism Theme */
-                    ${Prism.languages.javascript ? '' : '' /* Just to trigger import usage if needed, but we need the CSS content */}
                 </style>
-                <!-- Inject Prism CSS from parent (we'll fetch it or use a style tag) -->
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism-tomorrow.min.css">
                 <style>
-                    /* Custom Scrollbar for the iframe */
                     ::-webkit-scrollbar { width: 8px; height: 8px; }
                     ::-webkit-scrollbar-track { background: transparent; }
                     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -49,7 +42,7 @@ const PreviewPane = forwardRef<HTMLDivElement, PreviewPaneProps>(({ markdown, th
                 </style>
             </head>
             <body>
-                <div id="preview-content" style="padding: 24px;">
+                <div id="preview-content" style="padding: 28px;">
                     ${themedHtml}
                 </div>
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js"></script>
@@ -60,49 +53,45 @@ const PreviewPane = forwardRef<HTMLDivElement, PreviewPaneProps>(({ markdown, th
         doc.open();
         doc.write(fullContent);
         doc.close();
-
-        // Adjust height to fit content (optional, but good for auto-growing preview)
-        // For now, we want it to scroll within the fixed pane, so we'll just let it be.
-
     }, [themedHtml]);
 
     return (
-        <div className="h-100 d-flex flex-column">
-            <div className="border-bottom px-4 py-3 d-flex justify-content-between align-items-center" style={{ backgroundColor: theme.colors.background }}>
-                <h6 className="mb-0 fw-bold text-muted">PREVIEW</h6>
+        <div className="h-100 d-flex flex-column preview-pane-body">
+            <div
+                className="preview-pane-header"
+                style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}
+            >
+                <div className="preview-pane-label">
+                    <i className="bi bi-eye"></i>
+                    Preview
+                    <span className="preview-theme-badge">{theme.name}</span>
+                </div>
                 {onToggleFullScreen && (
                     <button
-                        className="btn btn-sm btn-icon-small"
+                        className="btn-pane-action"
                         onClick={onToggleFullScreen}
-                        title={isFullScreen ? "Exit Full Screen" : "Full Screen"}
-                        style={{ width: '24px', height: '24px', padding: 0 }}
+                        title={isFullScreen ? 'Exit Full Screen' : 'Full Screen'}
+                        type="button"
                     >
                         <i className={`bi ${isFullScreen ? 'bi-fullscreen-exit' : 'bi-arrows-fullscreen'}`}></i>
                     </button>
                 )}
             </div>
             <div
-                className="flex-grow-1 overflow-hidden"
-                style={{ backgroundColor: theme.colors.background }}
+                className="preview-iframe-wrap"
                 ref={(node) => {
-                    // Forward the wrapper div ref if needed, but for PDF we specifically need the iframe or its content
                     if (typeof ref === 'function') {
-                        // We'll pass the wrapper div for now, but ExportButton needs to handle iframe
                         ref(node);
                     } else if (ref) {
-                        (ref as any).current = node;
+                        (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
                     }
                 }}
             >
                 <iframe
                     ref={iframeRef}
                     title="Markdown Preview"
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                        border: 'none',
-                        backgroundColor: theme.colors.background
-                    }}
+                    className="preview-iframe"
+                    style={{ backgroundColor: theme.colors.background }}
                     sandbox="allow-scripts allow-same-origin"
                 />
             </div>

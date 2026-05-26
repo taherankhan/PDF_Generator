@@ -1,11 +1,12 @@
-import { FC, Suspense } from "react";
+import { FC, Suspense, lazy } from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
 import { MasterLayout } from "../../admin/layout/MasterLayout";
 import TopBarProgress from "react-topbar-progress-indicator";
 import { getCSSVariableValue } from "../../admin/assets/ts/_utils";
 import { WithChildren } from "../../admin/helpers";
 import LandingPage from "../modules/landing/LandingPage";
-import EditorPage from "../modules/editor/EditorPage";
+
+const EditorPage = lazy(() => import("../modules/editor/EditorPage"));
 
 const PrivateRoutes = () => {
   return (
@@ -19,7 +20,11 @@ const PrivateRoutes = () => {
         {/* Editor Page */}
         <Route
           path="/editor"
-          element={<EditorPage />}
+          element={
+            <SuspensedView>
+              <EditorPage />
+            </SuspensedView>
+          }
         />
 
         {/* Page Not Found */}

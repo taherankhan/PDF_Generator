@@ -121,16 +121,22 @@ export function buildDbShareUrl(id: string): string {
  * Update an existing payload (content & theme) in Supabase.
  */
 export async function updateSharePayloadInDb(id: string, payload: SharePayload): Promise<void> {
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("shares")
     .update({
       content: payload.content,
       theme: payload.theme ?? "professional",
     })
-    .eq("id", id);
+    .eq("id", id)
+    .select("id")
+    .single();
 
   if (error) {
     console.error("Error updating document in database:", error);
     throw error;
+  }
+
+  if (!data?.id) {
+    throw new Error("Update did not affect any rows. Check Supabase RLS UPDATE policy on public.shares.");
   }
 }

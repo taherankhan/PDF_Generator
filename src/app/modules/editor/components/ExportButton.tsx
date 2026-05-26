@@ -66,6 +66,7 @@ const ExportButton: FC<ExportButtonProps> = ({ markdown, themeId, previewRef, di
 
     return (
         <button
+            className="btn-export-pdf"
             onClick={handleExport}
             disabled={isExporting || disabled}
             style={buttonStyle}
