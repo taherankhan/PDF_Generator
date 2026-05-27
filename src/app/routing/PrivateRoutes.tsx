@@ -1,30 +1,30 @@
-import { FC, lazy, Suspense } from "react";
+import { FC, Suspense, lazy } from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
 import { MasterLayout } from "../../admin/layout/MasterLayout";
 import TopBarProgress from "react-topbar-progress-indicator";
 import { getCSSVariableValue } from "../../admin/assets/ts/_utils";
 import { WithChildren } from "../../admin/helpers";
 import LandingPage from "../modules/landing/LandingPage";
-import EditorPage from "../modules/editor/EditorPage";
+
+const EditorPage = lazy(() => import("../modules/editor/EditorPage"));
 
 const PrivateRoutes = () => {
   return (
     <Routes>
-      <Route element={<MasterLayout />}>
-        {/* Landing Page */}
-        <Route
-          path="/"
-          element={<LandingPage />}
-        />
-        <Route
-          index
-          element={<LandingPage />}
-        />
+      {/* Landing Page — rendered WITHOUT MasterLayout (full page control) */}
+      <Route path="/" element={<LandingPage />} />
+      <Route index element={<LandingPage />} />
 
+      {/* Routes that use MasterLayout (editor, etc.) */}
+      <Route element={<MasterLayout />}>
         {/* Editor Page */}
         <Route
           path="/editor"
-          element={<EditorPage />}
+          element={
+            <SuspensedView>
+              <EditorPage />
+            </SuspensedView>
+          }
         />
 
         {/* Page Not Found */}

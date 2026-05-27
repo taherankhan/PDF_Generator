@@ -1,0 +1,71 @@
+/* Custom Cursor CSS Styles */
+
+/* Main cursor dot styling */
+.custom-cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform;
+  box-shadow: 0 0 12px rgba(108, 99, 255, 0.45);
+}
+
+.custom-cursor-dot--hidden,
+.custom-cursor-ring--hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Outer trailing ring styling */
+.custom-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  will-change: transform, opacity;
+}
+
+/* Expanding click wave ring */
+.custom-cursor-click {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 64px;
+  height: 64px;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9996;
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Hides default browser cursor for the application container when custom cursor is active */
+body.has-custom-cursor,
+body.has-custom-cursor .app-container {
+  cursor: none !important;
+}
+
+/* Hides default browser cursor for interactive elements within the container */
+body.has-custom-cursor a,
+body.has-custom-cursor button,
+body.has-custom-cursor select,
+body.has-custom-cursor input,
+body.has-custom-cursor textarea,
+body.has-custom-cursor [role="button"],
+body.has-custom-cursor label,
+body.has-custom-cursor .lp-theme-row-btn,
+body.has-custom-cursor .lp-bento-theme-bubble,
+body.has-custom-cursor .lp-footer-dev-btn {
+  cursor: none !important;
+}
