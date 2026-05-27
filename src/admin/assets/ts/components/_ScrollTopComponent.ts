@@ -29,15 +29,14 @@ class ScrollTopComponent {
     this.options = Object.assign(defaultScrollTopOptions, options)
     this.instanceUid = getUniqueIdWithPrefix('scrolltop')
 
-    // Event Handlers
     this._handlers()
 
-    // Bind Instance
     DataUtil.set(this.element, 'scrolltop', this)
   }
 
   private _handlers = () => {
-    let timer: number
+    let timer: number | null = null
+
     window.addEventListener('scroll', () => {
       throttle(timer, () => {
         this._scroll()
@@ -52,7 +51,8 @@ class ScrollTopComponent {
 
   private _scroll = () => {
     const offset = parseInt(this._getOption('offset') as string)
-    const pos = getScrollTop() // current vertical position
+    const pos = getScrollTop()
+
     if (pos > offset) {
       if (!document.body.hasAttribute('data-kt-scrolltop')) {
         document.body.setAttribute('data-kt-scrolltop', 'on')
@@ -71,6 +71,7 @@ class ScrollTopComponent {
 
   private _getOption = (name: string) => {
     const attr = this.element.getAttribute(`data-kt-scrolltop-${name}`)
+
     if (attr) {
       const value = getAttributeValueByBreakpoint(attr)
       return value !== null && String(value) === 'true'
@@ -78,6 +79,7 @@ class ScrollTopComponent {
 
     const optionName = stringSnakeToCamel(name)
     const option = getObjectPropertyValueByKey(this.options, optionName)
+
     if (option) {
       return getAttributeValueByBreakpoint(option)
     }
@@ -85,11 +87,6 @@ class ScrollTopComponent {
     return null
   }
 
-  ///////////////////////
-  // ** Public API  ** //
-  ///////////////////////
-
-  // Plugin API
   public go = () => {
     return this._go()
   }
@@ -98,19 +95,23 @@ class ScrollTopComponent {
     return this.element
   }
 
-  // Static methods
   public static getInstance = (el: HTMLElement): ScrollTopComponent | undefined => {
     const scrollTop = DataUtil.get(el, 'scrolltop')
+
     if (scrollTop) {
       return scrollTop as ScrollTopComponent
     }
+
+    return undefined
   }
 
   public static createInstances = (selector: string) => {
     const elements = document.body.querySelectorAll(selector)
+
     elements.forEach((el) => {
       const item = el as HTMLElement
       let scrollTop = ScrollTopComponent.getInstance(item)
+
       if (!scrollTop) {
         scrollTop = new ScrollTopComponent(item, defaultScrollTopOptions)
       }
@@ -122,14 +123,18 @@ class ScrollTopComponent {
     options: IScrollTopOptions = defaultScrollTopOptions
   ): ScrollTopComponent | undefined => {
     const element = document.body.querySelector(selector)
+
     if (!element) {
-      return
+      return undefined
     }
+
     const item = element as HTMLElement
     let scrollTop = ScrollTopComponent.getInstance(item)
+
     if (!scrollTop) {
       scrollTop = new ScrollTopComponent(item, options)
     }
+
     return scrollTop
   }
 
@@ -145,4 +150,5 @@ class ScrollTopComponent {
     ElementAnimateUtil.scrollTop(0, defaultScrollTopOptions.speed)
   }
 }
-export {ScrollTopComponent, defaultScrollTopOptions}
+
+export { ScrollTopComponent, defaultScrollTopOptions }
