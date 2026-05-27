@@ -14,8 +14,10 @@ import { AppRoutes } from './app/routing/AppRoutes';
 import { ToastContainer } from 'react-toastify';
 // setupAxios(axios)
 import { AnalyticsService } from './services/AnalyticsService';
+import { injectSpeedInsights } from '@vercel/speed-insights';
 
 AnalyticsService.initialize();
+injectSpeedInsights();
 
 // Expose Analytics for testing in Dev mode
 if (import.meta.env.DEV) {
