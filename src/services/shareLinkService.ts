@@ -61,12 +61,13 @@ export function buildShareUrl(payload: SharePayload): string {
 /** Rough safe length for most browsers; beyond this we warn. */
 export const SHARE_URL_LENGTH_WARN = 1800;
 
-import { supabase } from "./supabaseClient";
+import { getSupabase } from "./supabaseClient";
 
 /**
  * Save payload (content & theme) to Supabase. Returns the short UUID of the row.
  */
 export async function saveSharePayloadToDb(payload: SharePayload): Promise<string> {
+  const supabase = await getSupabase();
   const { data, error } = await supabase
     .from("shares")
     .insert([
@@ -89,6 +90,7 @@ export async function saveSharePayloadToDb(payload: SharePayload): Promise<strin
  * Fetch payload from Supabase using its UUID.
  */
 export async function fetchSharePayloadFromDb(id: string): Promise<SharePayload | null> {
+  const supabase = await getSupabase();
   const { data, error } = await supabase
     .from("shares")
     .select("content, theme")
@@ -121,6 +123,7 @@ export function buildDbShareUrl(id: string): string {
  * Update an existing payload (content & theme) in Supabase.
  */
 export async function updateSharePayloadInDb(id: string, payload: SharePayload): Promise<void> {
+  const supabase = await getSupabase();
   const { data, error } = await supabase
     .from("shares")
     .update({

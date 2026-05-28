@@ -1,0 +1,32 @@
+// Core Bootstrap (trimmed — editor utilities + reboot; landing uses mostly custom .lp-* CSS)
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/variables-dark';
+@import 'bootstrap/scss/maps';
+@import 'bootstrap/scss/mixins';
+@import 'bootstrap/scss/utilities';
+
+@import 'bootstrap/scss/root';
+@import 'bootstrap/scss/reboot';
+@import 'bootstrap/scss/type';
+@import 'bootstrap/scss/containers';
+@import 'bootstrap/scss/grid';
+@import 'bootstrap/scss/helpers';
+@import 'bootstrap/scss/utilities/api';
+@import 'bootstrap/scss/spinners';
+@import 'bootstrap/scss/transitions';
+
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+:root {
+  --bs-primary: #6c63ff;
+}
+
+#root {
+  display: contents;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}

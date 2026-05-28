@@ -1,4 +1,4 @@
-import { supabase } from './supabaseClient';
+import { getSupabase } from './supabaseClient';
 
 export type ContactMessage = {
   email: string;
@@ -6,6 +6,7 @@ export type ContactMessage = {
 };
 
 export async function submitContactMessage(payload: ContactMessage): Promise<void> {
+  const supabase = await getSupabase();
   const { error } = await supabase.from('contact_messages').insert([
     {
       email: payload.email.trim(),

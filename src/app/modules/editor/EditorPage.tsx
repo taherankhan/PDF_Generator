@@ -9,7 +9,7 @@ import "./EditorPage.css";
 import { AnalyticsService } from "../../../services/AnalyticsService";
 import { decodeSharePayload, fetchSharePayloadFromDb } from "../../../services/shareLinkService";
 import { toast } from "react-toastify";
-import { supabase } from "../../../services/supabaseClient";
+import { getSupabase } from "../../../services/supabaseClient";
 
 const defaultMarkdown = `# Welcome to Markdown to PDF Converter
 
@@ -89,50 +89,68 @@ const EditorPage: FC = () => {
         toast.info(message, { toastId, autoClose: 3000 });
     };
 
-    // Supabase Realtime subscription for live updates
+    // Supabase Realtime subscription for live updates (client loaded on demand)
     useEffect(() => {
         if (!shareId) return;
 
-        const channel = supabase
-            .channel(`live-document-${shareId}`)
-            .on(
-                'postgres_changes',
-                {
-                    event: 'UPDATE',
-                    schema: 'public',
-                    table: 'shares',
-                    filter: `id=eq.${shareId}`
-                },
-                (payload) => {
-                    if (!payload.new) return;
+        let cancelled = false;
+        let subscription: { remove: () => void } | null = null;
 
-                    const newContent = payload.new.content as string;
-                    const newTheme = (payload.new.theme as string) || "professional";
+        void getSupabase().then((supabase) => {
+            if (cancelled) return;
 
-                    if (Date.now() < suppressRemoteUntilRef.current) {
+            const channel = supabase
+                .channel(`live-document-${shareId}`)
+                .on(
+                    'postgres_changes',
+                    {
+                        event: 'UPDATE',
+                        schema: 'public',
+                        table: 'shares',
+                        filter: `id=eq.${shareId}`,
+                    },
+                    (payload) => {
+                        if (!payload.new) return;
+
+                        const newContent = payload.new.content as string;
+                        const newTheme = (payload.new.theme as string) || 'professional';
+
+                        if (Date.now() < suppressRemoteUntilRef.current) {
+                            lastSyncedPayload.current = { content: newContent, theme: newTheme };
+                            return;
+                        }
+
+                        const matchesSynced =
+                            newContent === lastSyncedPayload.current.content &&
+                            newTheme === lastSyncedPayload.current.theme;
+                        const matchesLocal =
+                            newContent === markdownRef.current && newTheme === themeRef.current;
+
+                        if (matchesSynced || matchesLocal) return;
+
+                        setMarkdownContent(newContent);
+                        setSelectedTheme(newTheme);
                         lastSyncedPayload.current = { content: newContent, theme: newTheme };
-                        return;
+                        notifyRemoteUpdate('Document updated live by another user!');
                     }
+                )
+                .subscribe();
 
-                    const matchesSynced =
-                        newContent === lastSyncedPayload.current.content &&
-                        newTheme === lastSyncedPayload.current.theme;
-                    const matchesLocal =
-                        newContent === markdownRef.current &&
-                        newTheme === themeRef.current;
+            subscription = {
+                remove: () => {
+                    void supabase.removeChannel(channel);
+                },
+            };
 
-                    if (matchesSynced || matchesLocal) return;
-
-                    setMarkdownContent(newContent);
-                    setSelectedTheme(newTheme);
-                    lastSyncedPayload.current = { content: newContent, theme: newTheme };
-                    notifyRemoteUpdate("Document updated live by another user!");
-                }
-            )
-            .subscribe();
+            if (cancelled) {
+                subscription.remove();
+                subscription = null;
+            }
+        });
 
         return () => {
-            supabase.removeChannel(channel);
+            cancelled = true;
+            subscription?.remove();
         };
     }, [shareId]);
 

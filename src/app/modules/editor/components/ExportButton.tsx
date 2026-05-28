@@ -1,5 +1,9 @@
 import { FC, useState } from 'react';
 import { generatePDFFromElement } from '../../../../services/pdfGenerator';
+import {
+    getPdfExportUserMessage,
+    PDF_MAX_MARKDOWN_CHARS,
+} from '../../../../services/pdfErrors';
 import { toast } from 'react-toastify';
 import { getTheme } from '../../../../themes/themeConfig';
 
@@ -17,6 +21,15 @@ const ExportButton: FC<ExportButtonProps> = ({ markdown, themeId, previewRef, di
 
     const handleExport = async () => {
         if (!previewRef?.current) return;
+
+        if (markdown.length > PDF_MAX_MARKDOWN_CHARS) {
+            toast.error(
+                `Document is too large to export (${(markdown.length / 1000).toFixed(0)}k characters). ` +
+                    `Maximum is ${(PDF_MAX_MARKDOWN_CHARS / 1000).toFixed(0)}k. Shorten content or split the file.`,
+                { autoClose: 8000 }
+            );
+            return;
+        }
 
         try {
             setIsExporting(true);
@@ -38,8 +51,7 @@ const ExportButton: FC<ExportButtonProps> = ({ markdown, themeId, previewRef, di
 
             // Success toast removed as per request
         } catch (error) {
-            console.error('Export failed:', error);
-            toast.error('Failed to export PDF');
+            toast.error(getPdfExportUserMessage(error), { autoClose: 8000 });
         } finally {
             setIsExporting(false);
         }

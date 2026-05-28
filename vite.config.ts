@@ -1,9 +1,20 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
+export default defineConfig(({ mode }) => ({
+  plugins: [
+    react(),
+    mode === 'analyze' &&
+      visualizer({
+        filename: 'dist/stats.html',
+        open: true,
+        gzipSize: true,
+        brotliSize: true,
+        template: 'treemap',
+      }),
+  ].filter(Boolean),
   css: {
     preprocessorOptions: {
       scss: {
@@ -14,6 +25,15 @@ export default defineConfig({
   base: "/",
   build: {
     chunkSizeWarningLimit: 3000,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/@supabase/')) {
+            return 'supabase';
+          }
+        },
+      },
+    },
   },
   define:{
     'process.env': {},
@@ -22,6 +42,5 @@ export default defineConfig({
     open : true,
     port : 5173,
     allowedHosts: true
-  }
-
-})
+  },
+}))

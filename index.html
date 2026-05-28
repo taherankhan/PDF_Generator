@@ -1,217 +1,402 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
+    <!-- =============================================
+         CORE
+    ============================================= -->
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 
-    <!-- SEO -->
-    <title>Markdown to PDF Converter – Free Online MD to PDF Generator | MD2PDFX</title>
+    <!-- =============================================
+         PRIMARY SEO
+    ============================================= -->
+    <title>MD2PDFX – Free Markdown to PDF Converter | Live Editor & Instant Export</title>
 
     <meta
         name="description"
-        content="Convert Markdown to beautiful PDF instantly. Free online Markdown to PDF generator with live editor, real-time preview, multiple themes, and instant export. No signup required."
+        content="Convert Markdown to beautiful, print-ready PDFs in seconds. MD2PDFX offers a live side-by-side editor, real-time preview, multiple export themes, syntax highlighting, and zero signup required. The fastest free MD to PDF tool online."
     />
 
     <meta
         name="keywords"
-        content="markdown to pdf, md to pdf, markdown pdf converter, markdown editor, pdf generator, markdown export"
+        content="markdown to pdf, md to pdf, markdown pdf converter, markdown editor online, free pdf generator, markdown export, md2pdf, convert markdown, pdf from markdown, live markdown preview, markdown html pdf, developer tools, documentation generator"
     />
 
     <meta name="author" content="MD2PDFX" />
-    <meta name="robots" content="index, follow" />
-    <meta name="theme-color" content="#6c63ff" />
-    <meta
-        name="googlebot"
-        content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1"
-    />
+    <meta name="copyright" content="MD2PDFX" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
 
-    <!-- Google Search Console -->
-    <meta
-        name="google-site-verification"
-        content="tsh4h5Fl_7CZ0fauBdIC9cvtRWdn_rVCVjruhcEzu1A"
-    />
+    <!-- Language & Region -->
+    <meta name="language" content="English" />
+    <meta name="geo.region" content="US" />
+    <meta http-equiv="content-language" content="en" />
 
-    <!-- Canonical -->
+    <!-- =============================================
+         CANONICAL & ALTERNATES
+    ============================================= -->
     <link rel="canonical" href="https://md2pdfx.vercel.app/" />
 
-    <!-- Open Graph -->
+    <!-- =============================================
+         OPEN GRAPH (Facebook, LinkedIn, WhatsApp, Discord)
+    ============================================= -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="MD2PDFX" />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:url" content="https://md2pdfx.vercel.app/" />
-    <meta property="og:title" content="Markdown to PDF Converter – MD2PDFX" />
+    <meta property="og:title" content="MD2PDFX – Convert Markdown to PDF Instantly, Free & Online" />
     <meta
         property="og:description"
-        content="Convert Markdown to PDF instantly with live preview and beautiful export themes."
+        content="Write Markdown, get a stunning PDF. MD2PDFX gives you a live editor with real-time preview, multiple themes, syntax highlighting, and one-click PDF export — completely free, no account needed."
     />
-    <meta property="og:image" content="https://md2pdfx.vercel.app/favicon.svg" />
-    <meta property="og:site_name" content="MD2PDFX" />
+    <meta property="og:image" content="https://md2pdfx.vercel.app/og-image.png" />
+    <meta property="og:image:secure_url" content="https://md2pdfx.vercel.app/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="MD2PDFX – Markdown to PDF Converter interface showing live editor and PDF preview" />
 
-    <!-- Twitter -->
+    <!-- =============================================
+         TWITTER / X CARD
+    ============================================= -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Markdown to PDF Converter – MD2PDFX" />
+    <meta name="twitter:site" content="@md2pdfx" />
+    <meta name="twitter:creator" content="@md2pdfx" />
+    <meta name="twitter:title" content="MD2PDFX – Convert Markdown to PDF Instantly, Free & Online" />
     <meta
         name="twitter:description"
-        content="Free online Markdown to PDF generator with live preview."
+        content="Write Markdown, get a stunning PDF. Live editor, real-time preview, multiple themes &amp; one-click export. Free, no signup. 🚀"
     />
-    <meta name="twitter:image" content="https://md2pdfx.vercel.app/favicon.svg" />
+    <meta name="twitter:image" content="https://md2pdfx.vercel.app/og-image.png" />
+    <meta name="twitter:image:alt" content="MD2PDFX Markdown to PDF Converter – Live Editor Preview" />
 
-    <!-- App -->
+    <!-- =============================================
+         LINKEDIN SPECIFIC
+    ============================================= -->
+    <meta property="linkedin:title" content="MD2PDFX – Free Markdown to PDF Converter" />
+    <meta property="linkedin:description" content="The fastest way to convert Markdown to beautiful PDFs online. Live editor, multiple themes, instant export." />
+
+    <!-- =============================================
+         MOBILE & PWA
+    ============================================= -->
+    <meta name="theme-color" content="#6c63ff" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#4f46e5" media="(prefers-color-scheme: light)" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="MD2PDFX" />
+    <meta name="application-name" content="MD2PDFX" />
+    <meta name="msapplication-TileColor" content="#6c63ff" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <!-- =============================================
+         VERIFICATION
+    ============================================= -->
+    <meta name="google-site-verification" content="tsh4h5Fl_7CZ0fauBdIC9cvtRWdn_rVCVjruhcEzu1A" />
+
+    <!-- =============================================
+         FAVICON & ICONS
+    ============================================= -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="mask-icon" href="/favicon.svg" color="#6c63ff" />
+
+    <!-- PWA Manifest -->
     <link rel="manifest" href="/site.webmanifest" />
 
-    <!-- Icons -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="shortcut icon" href="/favicon.svg" />
-
-    <!-- Styles -->
-    <link rel="stylesheet" id="layout-styles-anchor" href="/splash-screen.css" />
-
-    <!-- Fonts -->
+    <!-- =============================================
+         PRECONNECT & DNS PREFETCH (Performance)
+    ============================================= -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://www.googletagmanager.com" />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+    <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+
+    <!-- =============================================
+         FONTS
+    ============================================= -->
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500&display=swap"
         rel="stylesheet"
     />
 
-    <!-- Google Analytics -->
+    <!-- =============================================
+         STYLES
+    ============================================= -->
+    <link rel="stylesheet" id="layout-styles-anchor" href="/splash-screen.css" />
+
+    <!-- =============================================
+         GOOGLE ANALYTICS (gtag.js)
+    ============================================= -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-0EK0H37FLD"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag() {
-            dataLayer.push(arguments);
-        }
+        function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-        gtag('config', 'G-0EK0H37FLD');
+        gtag('config', 'G-0EK0H37FLD', {
+            page_path: window.location.pathname,
+            anonymize_ip: true,
+            cookie_flags: 'SameSite=None;Secure'
+        });
     </script>
 
-    <!-- Structured SEO Data -->
+    <!-- =============================================
+         STRUCTURED DATA – WebApplication (Schema.org)
+    ============================================= -->
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "MD2PDFX",
-      "url": "https://md2pdfx.vercel.app/",
-      "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "Any",
-      "description": "Free online Markdown to PDF converter with live editor and PDF export.",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      }
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "@id": "https://md2pdfx.vercel.app/#webapp",
+        "name": "MD2PDFX",
+        "alternateName": "Markdown to PDF Converter",
+        "url": "https://md2pdfx.vercel.app/",
+        "logo": "https://md2pdfx.vercel.app/favicon.svg",
+        "image": "https://md2pdfx.vercel.app/og-image.png",
+        "description": "Free online Markdown to PDF converter with live editor, real-time preview, multiple export themes, syntax highlighting, and instant PDF download. No signup required.",
+        "applicationCategory": "DeveloperApplication",
+        "applicationSubCategory": "Document Converter",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript. Requires a modern browser.",
+        "inLanguage": "en",
+        "isAccessibleForFree": true,
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "Live Markdown editor with syntax highlighting",
+            "Real-time PDF preview",
+            "Multiple export themes",
+            "One-click PDF download",
+            "No account required",
+            "Dark and light mode support"
+        ],
+        "screenshot": "https://md2pdfx.vercel.app/og-image.png",
+        "creator": {
+            "@type": "Organization",
+            "name": "MD2PDFX",
+            "url": "https://md2pdfx.vercel.app/"
+        }
+    }
+    </script>
+
+    <!-- =============================================
+         STRUCTURED DATA – BreadcrumbList
+    ============================================= -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://md2pdfx.vercel.app/"
+            }
+        ]
+    }
+    </script>
+
+    <!-- =============================================
+         STRUCTURED DATA – FAQPage
+    ============================================= -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "Is MD2PDFX free to use?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, MD2PDFX is completely free. No account or subscription is required to convert Markdown to PDF."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How do I convert Markdown to PDF?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Paste or write your Markdown in the live editor, see a real-time PDF preview on the right, then click the export button to download your PDF instantly."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Does MD2PDFX support code syntax highlighting?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, MD2PDFX supports full syntax highlighting for code blocks in your Markdown documents when exported to PDF."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can I use MD2PDFX on mobile?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, MD2PDFX is fully responsive and works on mobile browsers. You can also install it as a PWA on supported devices."
+                }
+            }
+        ]
     }
     </script>
 </head>
 
 <body id="kt_body" class="page-loading">
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>
+        <strong>MD2PDFX requires JavaScript.</strong>
+        Please enable JavaScript in your browser settings to use the Markdown to PDF converter.
+    </noscript>
 
-    <!-- Theme -->
+    <!-- =============================================
+         THEME DETECTION (runs before paint to avoid flash)
+    ============================================= -->
     <script>
-        let themeMode = "system";
-        if (localStorage.getItem("kt_theme_mode_value")) {
-            themeMode = localStorage.getItem("kt_theme_mode_value");
-        }
-
-        if (themeMode === "system") {
-            themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches
-                ? "dark"
-                : "light";
-        }
-
-        document.documentElement.setAttribute("data-bs-theme", themeMode);
+        (function () {
+            try {
+                var stored = localStorage.getItem('kt_theme_mode_value');
+                var theme = stored || 'system';
+                if (theme === 'system') {
+                    theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                }
+                document.documentElement.setAttribute('data-bs-theme', theme);
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
     </script>
 
-    <div id="root"></div>
+    <!-- App Root -->
+    <div id="root" role="main" aria-label="MD2PDFX Application"></div>
 
-    <!-- Splash -->
-    <div id="splash-screen" class="splash-screen">
+    <!-- =============================================
+         SPLASH / LOADING SCREEN
+    ============================================= -->
+    <div
+        id="splash-screen"
+        class="splash-screen"
+        role="progressbar"
+        aria-label="Loading MD2PDFX"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+    >
         <div class="loading-container">
-            <div class="loading-text">
+            <div class="loading-text" aria-hidden="true">
                 <span>L</span><span>O</span><span>A</span><span>D</span><span>I</span><span>N</span><span>G</span>
             </div>
-
-            <div class="loading-percentage">0%</div>
-
-            <div class="progress-container">
+            <div class="loading-percentage" aria-hidden="true">0%</div>
+            <div class="progress-container" aria-hidden="true">
                 <div class="progress-bar"></div>
             </div>
         </div>
     </div>
 
-    <div id="root-modals"></div>
+    <!-- Modal Root -->
+    <div id="root-modals" aria-live="polite"></div>
 
-    <!-- GSAP -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <!-- =============================================
+         GSAP (Splash animation)
+    ============================================= -->
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
+        integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    ></script>
 
     <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            const tl = gsap.timeline();
-            let currentPercentage = 0;
+        (function () {
+            var splashEl = document.getElementById('splash-screen');
+            var percentageEl = document.querySelector('.loading-percentage');
 
-            tl.to('.loading-text', {
-                opacity: 1,
-                scale: 1,
-                duration: 0.5,
-                ease: 'back.out(1.7)'
-            })
-            .to('.loading-text span', {
-                opacity: 1,
-                y: 0,
-                stagger: 0.12,
-                duration: 0.6,
-                ease: 'power2.out'
-            }, '-=0.2')
-            .to('.loading-percentage', {
-                opacity: 1,
-                duration: 0.3
-            }, '-=0.3')
-            .to('.progress-container', {
-                opacity: 1,
-                duration: 0.4
-            }, '-=0.2')
-            .to('.progress-bar', {
-                width: '100%',
-                duration: 0.4,
-                ease: 'power2.inOut',
-                onUpdate: function () {
-                    const progress = this.progress();
-                    currentPercentage = Math.round(progress * 100);
+            function updateAria(val) {
+                if (splashEl) splashEl.setAttribute('aria-valuenow', val);
+            }
 
-                    const percentageEl = document.querySelector('.loading-percentage');
+            if (typeof gsap === 'undefined') {
+                // Fallback: hide splash immediately if GSAP fails to load
+                if (splashEl) splashEl.style.display = 'none';
+                return;
+            }
 
-                    if (percentageEl) {
-                        percentageEl.textContent = currentPercentage + '%';
+            window.addEventListener('DOMContentLoaded', function () {
+                var tl = gsap.timeline();
+
+                tl.to('.loading-text', {
+                    opacity: 1,
+                    scale: 1,
+                    duration: 0.5,
+                    ease: 'back.out(1.7)'
+                })
+                .to('.loading-text span', {
+                    opacity: 1,
+                    y: 0,
+                    stagger: 0.1,
+                    duration: 0.55,
+                    ease: 'power2.out'
+                }, '-=0.2')
+                .to('.loading-percentage', {
+                    opacity: 1,
+                    duration: 0.3
+                }, '-=0.3')
+                .to('.progress-container', {
+                    opacity: 1,
+                    duration: 0.35
+                }, '-=0.2')
+                .to('.progress-bar', {
+                    width: '100%',
+                    duration: 0.55,
+                    ease: 'power2.inOut',
+                    onUpdate: function () {
+                        var pct = Math.round(this.progress() * 100);
+                        if (percentageEl) percentageEl.textContent = pct + '%';
+                        updateAria(pct);
                     }
-                }
-            }, '-=0.1')
-            .to('.loading-text', {
-                scale: 1.2,
-                opacity: 0,
-                duration: 0.2,
-                ease: 'power2.in'
-            }, '-=0.1')
-            .to(['.loading-percentage', '.progress-container'], {
-                opacity: 0,
-                duration: 0.15,
-                ease: 'power2.in'
-            }, '-=0.2')
-            .to('.splash-screen', {
-                opacity: 0,
-                duration: 0.2,
-                ease: 'power2.inOut',
-                onComplete: () => {
-                    const splashScreen = document.getElementById('splash-screen');
-
-                    if (splashScreen) {
-                        splashScreen.style.display = 'none';
+                }, '-=0.1')
+                .to('.loading-text', {
+                    scale: 1.2,
+                    opacity: 0,
+                    duration: 0.2,
+                    ease: 'power2.in'
+                }, '-=0.1')
+                .to(['.loading-percentage', '.progress-container'], {
+                    opacity: 0,
+                    duration: 0.15,
+                    ease: 'power2.in'
+                }, '-=0.2')
+                .to('.splash-screen', {
+                    opacity: 0,
+                    duration: 0.25,
+                    ease: 'power2.inOut',
+                    onComplete: function () {
+                        if (splashEl) {
+                            splashEl.style.display = 'none';
+                            splashEl.setAttribute('aria-hidden', 'true');
+                        }
                     }
-                }
+                });
             });
-        });
+        })();
     </script>
 
+    <!-- =============================================
+         APP ENTRY POINT
+    ============================================= -->
     <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>

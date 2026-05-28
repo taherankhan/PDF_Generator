@@ -3,6 +3,61 @@ import html2canvas from 'html2canvas';
 import { parseMarkdown } from './markdownParser';
 import { getTheme, applyThemeToHTML } from '../themes/themeConfig';
 import Prism from 'prismjs';
+import {
+  PdfExportError,
+  PDF_EXPORT_TIMEOUT_MS,
+  PDF_MAX_CANVAS_PIXELS,
+  PDF_MAX_MARKDOWN_CHARS,
+} from './pdfErrors';
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(
+      () =>
+        reject(
+          new PdfExportError(
+            'EXPORT_TIMEOUT',
+            'PDF export timed out. Try a shorter document or fewer images.'
+          )
+        ),
+      ms
+    );
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (err) => {
+        clearTimeout(timer);
+        reject(err);
+      }
+    );
+  });
+}
+
+function assertCanvasWithinLimits(canvas: HTMLCanvasElement): void {
+  const pixels = canvas.width * canvas.height;
+  if (pixels > PDF_MAX_CANVAS_PIXELS) {
+    throw new PdfExportError(
+      'MEMORY_LIMIT',
+      `Document renders too large for PDF export. Shorten content or reduce images (render size: ${Math.round(pixels / 1_000_000)}M pixels).`
+    );
+  }
+}
+
+function mapRenderError(error: unknown): never {
+  if (error instanceof PdfExportError) {
+    throw error;
+  }
+  const message = error instanceof Error ? error.message : String(error);
+  if (/out of memory|allocation failed|canvas.*too large/i.test(message)) {
+    throw new PdfExportError(
+      'MEMORY_LIMIT',
+      'Browser ran out of memory while building the PDF. Use a shorter document.'
+    );
+  }
+  throw new PdfExportError('RENDER_FAILED', 'PDF rendering failed. Check images and formatting.');
+}
 
 export interface PDFOptions {
   filename?: string;
@@ -23,17 +78,17 @@ export const generatePDFFromMarkdown = async (
   options: PDFOptions = {}
 ): Promise<void> => {
   const opts = { ...defaultOptions, ...options };
-  
-  // Get theme
+
+  if (markdown.length > PDF_MAX_MARKDOWN_CHARS) {
+    throw new PdfExportError(
+      'DOCUMENT_TOO_LARGE',
+      `Document exceeds ${(PDF_MAX_MARKDOWN_CHARS / 1000).toFixed(0)}k characters. Shorten content before exporting.`
+    );
+  }
+
   const theme = getTheme(opts.themeId || 'professional');
-  
-  // Parse markdown to HTML
   const htmlContent = parseMarkdown(markdown);
   const themedHtml = applyThemeToHTML(htmlContent, theme);
-  
-  console.log('Generating PDF...');
-  console.log('Theme:', theme.name);
-  console.log('Markdown length:', markdown.length);
   
   // Create a temporary container matching preview pane styles
   const container = document.createElement('div');
@@ -173,39 +228,34 @@ export const generatePDFFromMarkdown = async (
   
   document.head.appendChild(prismStyles);
   document.body.appendChild(container);
-  
-  console.log('Container created, applying syntax highlighting...');
-  
+
   try {
     // Apply Prism syntax highlighting like preview does
     Prism.highlightAllUnder(container);
     
     // Wait for rendering and highlighting to complete
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    console.log('Starting html2canvas conversion...');
-    
-    // Convert HTML to canvas with optimized settings
-    const canvas = await html2canvas(container, {
-      scale: 1.5, // Reduced from 2 to keep file size reasonable
-      useCORS: true,
-      allowTaint: false,
-      backgroundColor: theme.colors.background,
-      logging: true, // Enable to see what's happening
-      windowWidth: 794,
-      windowHeight: container.scrollHeight,
-    });
-    
-    console.log('Canvas created:', canvas.width, 'x', canvas.height);
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    const canvas = await withTimeout(
+      html2canvas(container, {
+        scale: 1.5,
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: theme.colors.background,
+        logging: false,
+        windowWidth: 794,
+        windowHeight: container.scrollHeight,
+      }),
+      PDF_EXPORT_TIMEOUT_MS
+    );
+
+    assertCanvasWithinLimits(canvas);
     
     // Calculate PDF dimensions
     const imgWidth = 210; // A4 width in mm
     const pageHeight = 297; // A4 height in mm
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     
-    console.log('Creating PDF...');
-    
-    // Create PDF
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
@@ -219,8 +269,6 @@ export const generatePDFFromMarkdown = async (
     // Convert canvas to image with reduced quality for smaller file size
     const imgData = canvas.toDataURL('image/jpeg', 0.98);
     
-    console.log('Image data created, length:', imgData.length);
-    
     // Add first page
     pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
     heightLeft -= pageHeight;
@@ -233,15 +281,9 @@ export const generatePDFFromMarkdown = async (
       heightLeft -= pageHeight;
     }
     
-    console.log('Saving PDF:', opts.filename);
-    
-    // Save PDF
     pdf.save(opts.filename || 'document.pdf');
-    
-    console.log('PDF saved successfully!');
   } catch (error) {
-    console.error('Error generating PDF:', error);
-    throw error;
+    mapRenderError(error);
   } finally {
     // Clean up
     document.body.removeChild(container);
@@ -259,8 +301,6 @@ export const generatePDFFromElement = async (
 ): Promise<void> => {
   const opts = { ...defaultOptions, ...options };
   const theme = getTheme(opts.themeId || 'professional');
-  
-  console.log('Generating PDF from preview element...');
 
   // Handle Iframe source (PreviewPane refactor)
   let sourceElement: HTMLElement = element;
@@ -268,7 +308,6 @@ export const generatePDFFromElement = async (
 
   const iframe = element.querySelector('iframe');
   if (iframe && iframe.contentDocument) {
-      console.log('Detected Iframe preview, extracting content...');
       const iframeBody = iframe.contentDocument.body;
       const previewContent = iframeBody.querySelector('#preview-content') as HTMLElement;
       
@@ -290,8 +329,7 @@ export const generatePDFFromElement = async (
                   // Skip internal/blob URLs if needed, but try fetching everything
                   const response = await fetch(href);
                   return await response.text();
-              } catch (e) {
-                  console.warn('Failed to load stylesheet for PDF:', (style as HTMLLinkElement).href);
+              } catch {
                   return '';
               }
           }
@@ -314,7 +352,9 @@ export const generatePDFFromElement = async (
 
   try {
       const sandboxDoc = sandboxFrame.contentDocument;
-      if (!sandboxDoc) throw new Error('Could not access sandbox iframe document');
+      if (!sandboxDoc) {
+        throw new PdfExportError('RENDER_FAILED', 'Could not access PDF render frame.');
+      }
 
       // Write content to sandbox
       sandboxDoc.open();
@@ -421,8 +461,7 @@ export const generatePDFFromElement = async (
                 img.src = base64Data;
                 img.removeAttribute('crossorigin'); 
             }
-        } catch (error) {
-            console.warn('Failed to load image for PDF:', originalSrc);
+        } catch {
              img.crossOrigin = "anonymous";
         }
     });
@@ -433,28 +472,30 @@ export const generatePDFFromElement = async (
         new Promise(resolve => setTimeout(resolve, 5000))
     ]);
 
-    console.log('Starting html2canvas conversion...');
-    
-    // Convert sandbox wrapper to canvas (ensures margins are captured)
     const printWrapper = sandboxDoc.getElementById('print-wrapper');
-    if (!printWrapper) throw new Error('Print wrapper not found');
+    if (!printWrapper) {
+      throw new PdfExportError('RENDER_FAILED', 'Print layout not found.');
+    }
 
-    const canvas = await html2canvas(printWrapper, {
-        scale: 2, // High quality
+    const canvas = await withTimeout(
+      html2canvas(printWrapper, {
+        scale: 2,
         useCORS: true,
         allowTaint: true,
         logging: false,
         windowWidth: 794,
         width: 794,
-        backgroundColor: theme.colors.background
-    });
+        backgroundColor: theme.colors.background,
+      }),
+      PDF_EXPORT_TIMEOUT_MS
+    );
+
+    assertCanvasWithinLimits(canvas);
 
     // Calculate PDF dimensions
     const imgWidth = 210; // A4 width in mm
     const pageHeight = 297; // A4 height in mm
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    
-    console.log('Creating PDF...');
     
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -479,13 +520,9 @@ export const generatePDFFromElement = async (
       heightLeft -= pageHeight;
     }
     
-    console.log('Saving PDF:', opts.filename);
     pdf.save(opts.filename || 'document.pdf');
-    console.log('PDF saved successfully!');
-    
   } catch (error) {
-    console.error('Error generating PDF:', error);
-    throw error;
+    mapRenderError(error);
   } finally {
     if (document.body.contains(sandboxFrame)) {
         document.body.removeChild(sandboxFrame);

@@ -1,14 +1,7 @@
 import { FC } from 'react';
-import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { PdfTheme, THEMES, themeSwatchBg } from '../landingData';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
-import {
-  heroEnter,
-  heroKickerEnter,
-  heroMockupEnter,
-  heroTitleEnter,
-} from '../utils/heroMotion';
 import { scrollToSection } from '../utils/scrollTo';
 import { AnalyticsService } from '../../../../services/AnalyticsService';
 
@@ -25,101 +18,91 @@ const HERO_TITLE = {
 const HeroSection: FC<Props> = ({ selectedTheme, onThemeChange }) => {
   const navigate = useNavigate();
   const reducedMotion = usePrefersReducedMotion();
-  const off = reducedMotion ? { initial: false, animate: undefined } : {};
+
+  /*
+    Animation class helper.
+    When reducedMotion is true we omit the class so no animation plays.
+    Each class maps to a @keyframes rule in LandingPage.css (see below).
+  */
+  const anim = (cls: string) => (reducedMotion ? '' : cls);
 
   return (
     <>
       <section id="lp-hero" className="lp-hero">
         <div className="lp-hero-inner">
+
+          {/* ── Kicker row ──────────────────────────────── */}
           <div className="lp-hero-kicker">
-            <motion.span className="lp-hero-kicker-file" {...off} {...heroKickerEnter(0.05)}>
+            <span className={`lp-hero-kicker-file ${anim('lp-anim-kicker lp-anim-d1')}`}>
               document.md
-            </motion.span>
-            <motion.span
-              className="lp-hero-kicker-arrow"
+            </span>
+            <span
+              className={`lp-hero-kicker-arrow ${anim('lp-anim-kicker lp-anim-d2')}`}
               aria-hidden="true"
-              {...off}
-              {...heroKickerEnter(0.14)}
             >
               →
-            </motion.span>
-            <motion.span
-              className="lp-hero-kicker-file lp-hero-kicker-file--out"
-              {...off}
-              {...heroKickerEnter(0.22)}
-            >
+            </span>
+            <span className={`lp-hero-kicker-file lp-hero-kicker-file--out ${anim('lp-anim-kicker lp-anim-d3')}`}>
               export.pdf
-            </motion.span>
-            <motion.span
-              className="lp-hero-kicker-sep"
+            </span>
+            <span
+              className={`lp-hero-kicker-sep ${anim('lp-anim-kicker lp-anim-d4')}`}
               aria-hidden="true"
-              {...off}
-              {...heroKickerEnter(0.3)}
             />
-            <motion.span className="lp-hero-kicker-label" {...off} {...heroKickerEnter(0.36)}>
+            <span className={`lp-hero-kicker-label ${anim('lp-anim-kicker lp-anim-d5')}`}>
               client-side
-            </motion.span>
+            </span>
           </div>
 
+          {/* ── Hero title ──────────────────────────────── */}
           <h1 className="lp-hero-title">
-            <motion.span
-              className="lp-hero-title-line"
-              {...off}
-              {...heroTitleEnter(0.12)}
-            >
+            <span className={`lp-hero-title-line ${anim('lp-anim-title lp-anim-d6')}`}>
               {HERO_TITLE.lead}
-            </motion.span>
-            <motion.span
-              className={`lp-hero-title-line lp-hero-title-line--accent${reducedMotion ? ' lp-hero-title-line--static' : ''}`}
-              {...off}
-              {...heroTitleEnter(0.24)}
+            </span>
+            <span
+              className={`lp-hero-title-line lp-hero-title-line--accent${reducedMotion ? ' lp-hero-title-line--static' : ''} ${anim('lp-anim-title lp-anim-d7')}`}
             >
               {HERO_TITLE.accent}
-            </motion.span>
+            </span>
           </h1>
 
-          <motion.p className="lp-hero-sub" {...off} {...heroEnter(0.34)}>
+          {/* ── Subtitle ────────────────────────────────── */}
+          <p className={`lp-hero-sub ${anim('lp-anim-rise lp-anim-d8')}`}>
             Split editor, live preview, and one-click export — six themes built for print.
             No account, no uploads. Everything stays on your machine.
-          </motion.p>
+          </p>
 
-          <motion.div className="lp-hero-actions" {...off} {...heroEnter(0.48)}>
-            <motion.button
+          {/* ── CTA buttons ─────────────────────────────── */}
+          <div className={`lp-hero-actions ${anim('lp-anim-rise lp-anim-d9')}`}>
+            <button
               id="lp-hero-cta-primary"
-              className="lp-btn-primary"
+              className="lp-btn-primary lp-btn--interactive"
               type="button"
               onClick={() => {
                 AnalyticsService.events.landingCta('hero_open_editor');
                 navigate('/editor');
               }}
-              whileHover={reducedMotion ? undefined : { scale: 1.04, y: -2 }}
-              whileTap={reducedMotion ? undefined : { scale: 0.98 }}
             >
               Open Editor
-            </motion.button>
-            <motion.button
+            </button>
+            <button
               id="lp-hero-cta-secondary"
-              className="lp-btn-ghost"
+              className="lp-btn-ghost lp-btn--interactive"
               type="button"
               onClick={() => {
                 AnalyticsService.events.landingNav('lp-features');
                 scrollToSection('lp-features');
               }}
-              whileHover={reducedMotion ? undefined : { scale: 1.03, y: -1 }}
-              whileTap={reducedMotion ? undefined : { scale: 0.98 }}
             >
               See features
-            </motion.button>
-          </motion.div>
+            </button>
+          </div>
         </div>
       </section>
 
+      {/* ── Mockup ────────────────────────────────────────── */}
       <section className="lp-hero-mockup-section">
-        <motion.div
-          className="lp-hero-mockup-inner"
-          {...off}
-          {...heroMockupEnter}
-        >
+        <div className={`lp-hero-mockup-inner ${anim('lp-anim-mockup')}`}>
           <div className="lp-hero-mockup">
             <div className="lp-mockup-window" role="img" aria-label="Editor preview">
               <div className="lp-mockup-topbar">
@@ -152,7 +135,9 @@ const HeroSection: FC<Props> = ({ selectedTheme, onThemeChange }) => {
                   <span className="lp-mockup-preview-label">Live Preview →</span>
                 </div>
               </div>
+
               <div className="lp-mockup-body">
+                {/* Markdown panel */}
                 <div className="lp-mockup-panel">
                   <div className="tok-h"># My Professional Resume</div>
                   <div>&nbsp;</div>
@@ -168,6 +153,8 @@ const HeroSection: FC<Props> = ({ selectedTheme, onThemeChange }) => {
                   <div className="tok-link">[GitHub](https://github.com/taherankhan)</div>
                   <div className="tok-link">[LinkedIn](https://www.linkedin.com/in/taherankhan)</div>
                 </div>
+
+                {/* Preview panel */}
                 <div
                   className="lp-mockup-panel lp-mockup-preview"
                   style={{ background: selectedTheme.bg, color: selectedTheme.text }}
@@ -233,7 +220,7 @@ const HeroSection: FC<Props> = ({ selectedTheme, onThemeChange }) => {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </section>
     </>
   );

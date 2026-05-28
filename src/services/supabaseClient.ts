@@ -1,15 +1,28 @@
-import { createClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const supabaseAnonKey =
+  import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn(
-    'Supabase environment variables (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY) are missing! Document sharing will fallback to local storage or error.'
-  );
+let clientPromise: Promise<SupabaseClient> | null = null;
+
+/**
+ * Lazy-loads the Supabase client so the landing bundle does not include Auth/Realtime/PostgREST.
+ */
+export function getSupabase(): Promise<SupabaseClient> {
+  if (!clientPromise) {
+    clientPromise = (async () => {
+      if (!supabaseUrl || !supabaseAnonKey) {
+        console.warn(
+          'Supabase environment variables (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY) are missing. Cloud share and contact may fail.'
+        );
+      }
+      const { createClient } = await import('@supabase/supabase-js');
+      return createClient(
+        supabaseUrl || 'https://placeholder-url.supabase.co',
+        supabaseAnonKey || 'placeholder-anon-key'
+      );
+    })();
+  }
+  return clientPromise;
 }
-
-export const supabase = createClient(
-  supabaseUrl || 'https://placeholder-url.supabase.co',
-  supabaseAnonKey || 'placeholder-anon-key'
-);

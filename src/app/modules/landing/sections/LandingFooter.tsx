@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ContactForm from '../components/ContactForm';
 import FooterDeveloperCard from '../components/FooterDeveloperCard';
 import { DEVELOPER } from '../landingData';
@@ -88,8 +88,13 @@ const LandingFooter: FC = () => {
 
           <div className="lp-footer-bottom lp-footer-bottom--cyber">
             <p>© {new Date().getFullYear()} PDF Generator · Built by {displayName}</p>
+            <nav className="lp-footer-legal" aria-label="Legal">
+              <Link to="/privacy">Privacy Policy</Link>
+              <span aria-hidden="true">·</span>
+              <Link to="/terms">Terms of Service</Link>
+            </nav>
             <p className="lp-footer-bottom-note">
-              Editor runs 100% client-side · Contact messages stored securely
+              Editor runs in your browser · Contact messages stored when you submit the form
             </p>
           </div>
         </div>
