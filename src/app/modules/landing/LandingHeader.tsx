@@ -27,11 +27,20 @@ const LandingHeader: FC = () => {
     }
   }, []);
 
-  /* ── Scroll-triggered glass header ── */
+  /* ── Scroll-triggered glass header (rAF-throttled to avoid forced reflow) ── */
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 16);
+    let ticking = false;
+    const update = () => {
+      setScrolled(window.scrollY > 16);
+      ticking = false;
+    };
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
+    update();
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 

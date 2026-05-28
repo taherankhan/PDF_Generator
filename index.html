@@ -125,7 +125,7 @@
          FONTS
     ============================================= -->
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500&family=Syne:wght@700;800&display=swap"
         rel="stylesheet"
     />
 
@@ -137,15 +137,22 @@
     <!-- =============================================
          GOOGLE ANALYTICS (gtag.js)
     ============================================= -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0EK0H37FLD"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'G-0EK0H37FLD', {
-            page_path: window.location.pathname,
-            anonymize_ip: true,
-            cookie_flags: 'SameSite=None;Secure'
+        window.addEventListener('load', function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.src = 'https://www.googletagmanager.com/gtag/js?id=G-0EK0H37FLD';
+            s.onload = function () {
+                gtag('js', new Date());
+                gtag('config', 'G-0EK0H37FLD', {
+                    page_path: window.location.pathname,
+                    anonymize_ip: true,
+                    cookie_flags: 'SameSite=None;Secure'
+                });
+            };
+            document.head.appendChild(s);
         });
     </script>
 
@@ -313,6 +320,7 @@
          GSAP (Splash animation)
     ============================================= -->
     <script
+        defer
         src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
         integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg=="
         crossorigin="anonymous"
@@ -328,6 +336,14 @@
                 if (splashEl) splashEl.setAttribute('aria-valuenow', val);
             }
 
+            if (window.__md2pdfxSplashDismissed) {
+                if (splashEl) {
+                    splashEl.style.display = 'none';
+                    splashEl.setAttribute('aria-hidden', 'true');
+                }
+                return;
+            }
+
             if (typeof gsap === 'undefined') {
                 // Fallback: hide splash immediately if GSAP fails to load
                 if (splashEl) splashEl.style.display = 'none';
@@ -335,6 +351,7 @@
             }
 
             window.addEventListener('DOMContentLoaded', function () {
+                if (window.__md2pdfxSplashDismissed) return;
                 var tl = gsap.timeline();
 
                 tl.to('.loading-text', {

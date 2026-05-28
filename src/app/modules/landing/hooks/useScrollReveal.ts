@@ -1,21 +1,29 @@
 import { useEffect } from 'react';
+import { runWhenIdle } from '../../../../utils/deferNonCritical';
 
 export const useScrollReveal = () => {
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('revealed');
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
-    );
+    let observer: IntersectionObserver | undefined;
 
-    document.querySelectorAll('.lp-reveal').forEach((el) => observer.observe(el));
+    const cancelIdle = runWhenIdle(() => {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('revealed');
+              observer?.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+      );
 
-    return () => observer.disconnect();
+      document.querySelectorAll('.lp-reveal').forEach((el) => observer?.observe(el));
+    }, 1500);
+
+    return () => {
+      cancelIdle();
+      observer?.disconnect();
+    };
   }, []);
 };

@@ -1,14 +1,30 @@
-import { Suspense } from 'react'
+import { Suspense, lazy, useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom'
-import { Analytics } from '@vercel/analytics/react'
+import { runWhenIdle } from '../utils/deferNonCritical'
 
-const App = () => (
-  <>
-    <Suspense fallback={null}>
-      <Outlet />
-    </Suspense>
-    <Analytics />
-  </>
+const VercelAnalytics = lazy(() =>
+  import('@vercel/analytics/react').then((m) => ({ default: m.Analytics }))
 )
+
+const App = () => {
+  const [showAnalytics, setShowAnalytics] = useState(false)
+
+  useEffect(() => {
+    return runWhenIdle(() => setShowAnalytics(true), 2500)
+  }, [])
+
+  return (
+    <>
+      <Suspense fallback={null}>
+        <Outlet />
+      </Suspense>
+      {showAnalytics ? (
+        <Suspense fallback={null}>
+          <VercelAnalytics />
+        </Suspense>
+      ) : null}
+    </>
+  )
+}
 
 export { App }

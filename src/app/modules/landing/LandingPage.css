@@ -4,7 +4,7 @@
    Font: Inter (Google Fonts)
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Fira+Code:wght@400;500&family=Syne:wght@700;800&display=swap');
+/* Fonts loaded from index.html (avoid duplicate render-blocking @import) */
 
 /* ── Global overrides (applied only when landing page CSS is loaded) */
 html.lp-scroll-root {
@@ -19,6 +19,12 @@ html.lp-scroll-root body {
   min-height: 100%;
   display: block !important;
   overflow: visible !important;
+}
+
+html.lp-active,
+html.lp-active body {
+  background: #050810 !important;
+  color: #f1f5f9;
 }
 
 html {
@@ -129,6 +135,8 @@ html {
   padding: 0 24px 16px;
   position: relative;
   background: transparent;
+  /* Reserve space before mockup paint/animation (CLS) */
+  min-height: clamp(320px, 42vw, 480px);
 }
 
 .lp-hero-mockup-inner {
@@ -3394,13 +3402,12 @@ html {
    ════════════════════════════════════════════════════════════ */
 .lp-reveal {
   opacity: 0;
-  transform: translateY(40px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
+  /* Opacity-only reveal avoids layout shift (translateY hurt CLS) */
+  transition: opacity 0.7s ease;
 }
 
 .lp-reveal.revealed {
   opacity: 1;
-  transform: translateY(0);
 }
 
 /* Sticky panels must not use transform — it breaks position: sticky */

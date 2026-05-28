@@ -25,22 +25,12 @@ export const useLandingBodyTheme = () => {
     body.classList.add('lp-scroll-root');
     body.classList.remove('page-loading');
 
-    targets.forEach((el) => {
-      el.style.background = '#050810';
-      el.style.color = '#f1f5f9';
-    });
-
-    body.style.overflow = 'visible';
-    body.style.height = '';
-    body.style.display = '';
-    body.style.position = '';
-    body.style.width = '';
-    html.style.overflowX = 'hidden';
-    html.style.overflowY = 'auto';
+    html.classList.add('lp-active');
+    body.classList.add('lp-active');
 
     return () => {
-      html.classList.remove('lp-scroll-root');
-      body.classList.remove('lp-scroll-root');
+      html.classList.remove('lp-scroll-root', 'lp-active');
+      body.classList.remove('lp-scroll-root', 'lp-active');
 
       saved.forEach(({ el, bg, color, overflow, overflowX, overflowY, height, display, position, width }) => {
         el.style.background = bg;
