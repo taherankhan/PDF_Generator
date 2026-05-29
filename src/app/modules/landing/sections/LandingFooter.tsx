@@ -19,10 +19,6 @@ const LandingFooter: FC = () => {
             <div className="lp-cta-glow-1" aria-hidden="true" />
             <div className="lp-cta-glow-2" aria-hidden="true" />
             <div className="lp-cta-grid" aria-hidden="true" />
-            <div className="lp-cta-particle lp-cta-particle-1" aria-hidden="true" />
-            <div className="lp-cta-particle lp-cta-particle-2" aria-hidden="true" />
-            <div className="lp-cta-particle lp-cta-particle-3" aria-hidden="true" />
-            <div className="lp-cta-particle lp-cta-particle-4" aria-hidden="true" />
 
             <div className="lp-cta-content">
               <h2 className="lp-cta-title">

@@ -1,0 +1,7 @@
+# https://md2pdfx.vercel.app/
+User-agent: *
+Allow: /
+
+Disallow: /error/
+
+Sitemap: https://md2pdfx.vercel.app/sitemap.xml

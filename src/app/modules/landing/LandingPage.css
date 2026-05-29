@@ -730,6 +730,30 @@ html {
   }
 }
 
+/* Mobile / narrow viewports: show hero immediately (PageSpeed LCP is the headline) */
+@media (max-width: 768px) {
+  .lp-hero .lp-anim-kicker,
+  .lp-hero .lp-anim-title,
+  .lp-hero .lp-anim-rise,
+  .lp-hero .lp-anim-mockup {
+    opacity: 1 !important;
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .lp-page-grid {
+    animation: none !important;
+  }
+
+  .lp-cta-banner::before {
+    animation: none !important;
+  }
+
+  .lp-orb {
+    animation: none !important;
+  }
+}
+
 /* Primary CTA */
 .lp-btn-primary {
   display: inline-flex;
@@ -958,11 +982,16 @@ html {
   background: #fff;
 }
 
-.lp-mockup-preview h3 {
+.lp-mockup-preview .lp-preview-doc-title {
   font-size: 16px;
   font-weight: 700;
   color: #1e293b;
-  margin-bottom: 8px;
+  margin: 0 0 8px;
+}
+
+.lp-mockup-preview .lp-preview-subhead {
+  font-weight: 700;
+  margin: 0 0 6px;
 }
 
 .lp-mockup-preview p {
@@ -2352,106 +2381,6 @@ html {
 
   100% {
     background-position: 0% 50%;
-  }
-}
-
-/* CTA particles */
-.lp-cta-particle {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  background: #fff;
-  border-radius: 50%;
-  opacity: 0.3;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.lp-cta-particle-1 {
-  top: 20%;
-  left: 15%;
-  background: #a78bfa;
-  box-shadow: 0 0 10px #a78bfa;
-  animation: cta-drift-1 18s infinite ease-in-out;
-}
-
-.lp-cta-particle-2 {
-  top: 70%;
-  left: 80%;
-  background: #22d3ee;
-  box-shadow: 0 0 10px #22d3ee;
-  animation: cta-drift-2 22s infinite ease-in-out;
-}
-
-.lp-cta-particle-3 {
-  top: 40%;
-  left: 85%;
-  background: #f472b6;
-  box-shadow: 0 0 10px #f472b6;
-  animation: cta-drift-3 20s infinite ease-in-out;
-}
-
-.lp-cta-particle-4 {
-  top: 80%;
-  left: 25%;
-  background: #fbbf24;
-  box-shadow: 0 0 10px #fbbf24;
-  animation: cta-drift-4 24s infinite ease-in-out;
-}
-
-@keyframes cta-drift-1 {
-
-  0%,
-  100% {
-    transform: translateY(0) translateX(0);
-    opacity: 0.2;
-  }
-
-  50% {
-    transform: translateY(-40px) translateX(20px);
-    opacity: 0.5;
-  }
-}
-
-@keyframes cta-drift-2 {
-
-  0%,
-  100% {
-    transform: translateY(0) translateX(0);
-    opacity: 0.3;
-  }
-
-  50% {
-    transform: translateY(30px) translateX(-30px);
-    opacity: 0.6;
-  }
-}
-
-@keyframes cta-drift-3 {
-
-  0%,
-  100% {
-    transform: translateY(0) translateX(0);
-    opacity: 0.2;
-  }
-
-  50% {
-    transform: translateY(-30px) translateX(-20px);
-    opacity: 0.5;
-  }
-}
-
-@keyframes cta-drift-4 {
-
-  0%,
-  100% {
-    transform: translateY(0) translateX(0);
-    opacity: 0.3;
-  }
-
-  50% {
-    transform: translateY(40px) translateX(40px);
-    opacity: 0.6;
   }
 }
 
@@ -4676,7 +4605,6 @@ html {
   .lp-hero-mockup,
   .lp-mockup-window::after,
   .lp-cta-banner::before,
-  .lp-cta-particle,
   .lp-bento-progress-bar,
   .lp-bento-shield,
   .lp-bento-cursor,

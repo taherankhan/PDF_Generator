@@ -125,7 +125,12 @@
          FONTS
     ============================================= -->
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500&family=Syne:wght@700;800&display=swap"
+        rel="preload"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Fira+Code:wght@400;500&family=Syne:wght@700;800&display=swap"
+        as="style"
+    />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Fira+Code:wght@400;500&family=Syne:wght@700;800&display=swap"
         rel="stylesheet"
     />
 
@@ -316,98 +321,29 @@
     <!-- Modal Root -->
     <div id="root-modals" aria-live="polite"></div>
 
-    <!-- =============================================
-         GSAP (Splash animation)
-    ============================================= -->
-    <script
-        defer
-        src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
-        integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg=="
-        crossorigin="anonymous"
-        referrerpolicy="no-referrer"
-    ></script>
-
+    <!-- Lightweight splash dismiss (no GSAP — improves LCP/TBT on mobile) -->
     <script>
         (function () {
             var splashEl = document.getElementById('splash-screen');
-            var percentageEl = document.querySelector('.loading-percentage');
-
-            function updateAria(val) {
-                if (splashEl) splashEl.setAttribute('aria-valuenow', val);
-            }
-
-            if (window.__md2pdfxSplashDismissed) {
-                if (splashEl) {
+            function hideSplash() {
+                if (window.__md2pdfxSplashDismissed) return;
+                window.__md2pdfxSplashDismissed = true;
+                if (!splashEl) return;
+                splashEl.style.transition = 'opacity 0.2s ease-out';
+                splashEl.style.opacity = '0';
+                var done = function () {
                     splashEl.style.display = 'none';
                     splashEl.setAttribute('aria-hidden', 'true');
-                }
-                return;
+                    document.body.classList.remove('page-loading');
+                };
+                splashEl.addEventListener('transitionend', done, { once: true });
+                setTimeout(done, 250);
             }
-
-            if (typeof gsap === 'undefined') {
-                // Fallback: hide splash immediately if GSAP fails to load
-                if (splashEl) splashEl.style.display = 'none';
-                return;
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', hideSplash);
+            } else {
+                hideSplash();
             }
-
-            window.addEventListener('DOMContentLoaded', function () {
-                if (window.__md2pdfxSplashDismissed) return;
-                var tl = gsap.timeline();
-
-                tl.to('.loading-text', {
-                    opacity: 1,
-                    scale: 1,
-                    duration: 0.5,
-                    ease: 'back.out(1.7)'
-                })
-                .to('.loading-text span', {
-                    opacity: 1,
-                    y: 0,
-                    stagger: 0.1,
-                    duration: 0.55,
-                    ease: 'power2.out'
-                }, '-=0.2')
-                .to('.loading-percentage', {
-                    opacity: 1,
-                    duration: 0.3
-                }, '-=0.3')
-                .to('.progress-container', {
-                    opacity: 1,
-                    duration: 0.35
-                }, '-=0.2')
-                .to('.progress-bar', {
-                    width: '100%',
-                    duration: 0.55,
-                    ease: 'power2.inOut',
-                    onUpdate: function () {
-                        var pct = Math.round(this.progress() * 100);
-                        if (percentageEl) percentageEl.textContent = pct + '%';
-                        updateAria(pct);
-                    }
-                }, '-=0.1')
-                .to('.loading-text', {
-                    scale: 1.2,
-                    opacity: 0,
-                    duration: 0.2,
-                    ease: 'power2.in'
-                }, '-=0.1')
-                .to(['.loading-percentage', '.progress-container'], {
-                    opacity: 0,
-                    duration: 0.15,
-                    ease: 'power2.in'
-                }, '-=0.2')
-                .to('.splash-screen', {
-                    opacity: 0,
-                    duration: 0.25,
-                    ease: 'power2.inOut',
-                    onComplete: function () {
-                        if (splashEl) {
-                            splashEl.style.display = 'none';
-                            splashEl.setAttribute('aria-hidden', 'true');
-                        }
-                    }
-                });
-            });
         })();
     </script>
 

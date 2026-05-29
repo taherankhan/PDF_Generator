@@ -158,16 +158,26 @@ const HeroSection: FC<Props> = ({ selectedTheme, onThemeChange }) => {
                 <div
                   className="lp-mockup-panel lp-mockup-preview"
                   style={{ background: selectedTheme.bg, color: selectedTheme.text }}
+                  aria-hidden="true"
                 >
-                  <h3 style={{ color: selectedTheme.text }}>My Professional Resume</h3>
+                  <p className="lp-preview-doc-title" style={{ color: selectedTheme.text }}>
+                    My Professional Resume
+                  </p>
                   <p style={{ color: selectedTheme.text, opacity: 0.8 }}>
                     <strong>Taheran Khan</strong> · Full Stack Engineer
                   </p>
-                  <h3 className="lp-preview-subhead" style={{ color: selectedTheme.text }}>Experience</h3>
+                  <p className="lp-preview-subhead" style={{ color: selectedTheme.text }}>
+                    Experience
+                  </p>
                   <p className="lp-preview-line" style={{ color: selectedTheme.text, opacity: 0.8 }}>
                     • Full Stack Engineer (2+ years)
                   </p>
-                  <h3 className="lp-preview-subhead lp-preview-subhead--spaced" style={{ color: selectedTheme.text }}>Skills</h3>
+                  <p
+                    className="lp-preview-subhead lp-preview-subhead--spaced"
+                    style={{ color: selectedTheme.text }}
+                  >
+                    Skills
+                  </p>
                   <p>
                     {['Node', 'React', 'Mongo', 'Next', 'Express'].map((skill) => (
                       <span
