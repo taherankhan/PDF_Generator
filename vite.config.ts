@@ -31,6 +31,12 @@ export default defineConfig(({ mode }) => ({
           if (id.includes('node_modules/@supabase/')) {
             return 'supabase';
           }
+          if (id.includes('node_modules/@codemirror/')) {
+            return 'codemirror';
+          }
+          if (id.includes('node_modules/mermaid')) {
+            return 'mermaid';
+          }
         },
       },
     },

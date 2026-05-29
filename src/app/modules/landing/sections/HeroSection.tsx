@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PdfTheme, THEMES, themeSwatchBg } from '../landingData';
+import { HERO_FEATURE_CHIPS, PdfTheme, THEMES, themeSwatchBg } from '../landingData';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { scrollToSection } from '../utils/scrollTo';
 import { AnalyticsService } from '../../../../services/AnalyticsService';
@@ -43,7 +43,7 @@ const HeroSection: FC<Props> = ({ selectedTheme, onThemeChange }) => {
               →
             </span>
             <span className={`lp-hero-kicker-file lp-hero-kicker-file--out ${anim('lp-anim-kicker lp-anim-d3')}`}>
-              export.pdf
+              export.pdf · .md · .html
             </span>
             <span
               className={`lp-hero-kicker-sep ${anim('lp-anim-kicker lp-anim-d4')}`}
@@ -66,9 +66,18 @@ const HeroSection: FC<Props> = ({ selectedTheme, onThemeChange }) => {
 
           {/* ── Subtitle (no entrance animation — Lighthouse LCP element) */}
           <p className="lp-hero-sub">
-            Split editor, live preview, and one-click export — six themes built for print.
-            No account, no uploads. Everything stays on your machine.
+            CodeMirror editor with Edit, Split, and Preview, content-block snippets, Mermaid diagrams,
+            and export to PDF, Markdown, or HTML. Free to start — sharing is optional and only when you
+            create a link.
           </p>
+
+          <ul className="lp-hero-chips" aria-label="Editor highlights">
+            {HERO_FEATURE_CHIPS.map((chip) => (
+              <li key={chip} className="lp-hero-chip">
+                {chip}
+              </li>
+            ))}
+          </ul>
 
           {/* ── CTA buttons ─────────────────────────────── */}
           <div className={`lp-hero-actions ${anim('lp-anim-rise lp-anim-d9')}`}>
@@ -109,8 +118,10 @@ const HeroSection: FC<Props> = ({ selectedTheme, onThemeChange }) => {
                   <span className="lp-mockup-dot lp-mockup-dot-amber" />
                   <span className="lp-mockup-dot lp-mockup-dot-green" />
                 </div>
-                <span className="lp-mockup-title">document.md</span>
+                <span className="lp-mockup-title">Untitled document</span>
                 <div className="lp-mockup-topbar-actions">
+                  <span className="lp-mockup-pill">Snippets</span>
+                  <span className="lp-mockup-pill lp-mockup-pill--accent">Export</span>
                   <div className="lp-mockup-theme-picker">
                     <span className="lp-mockup-theme-label">Theme</span>
                     <div className="lp-mockup-theme-dots">

@@ -1,5 +1,6 @@
 import { FC, useEffect, useRef, forwardRef } from 'react';
 import { parseMarkdown } from '../../../../services/markdownParser';
+import { mermaidPreviewScriptTag } from '../../../../services/renderMermaidInDocument';
 import { getTheme, applyThemeToHTML } from '../../../../themes/themeConfig';
 import Prism from 'prismjs';
 import 'prismjs/themes/prism-tomorrow.css';
@@ -39,6 +40,8 @@ const PreviewPane = forwardRef<HTMLDivElement, PreviewPaneProps>(({ markdown, th
                     ::-webkit-scrollbar-track { background: transparent; }
                     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
                     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+                    .mermaid { display: flex; justify-content: center; margin: 1.25rem 0; max-width: 100%; overflow-x: auto; }
+                    .mermaid svg { max-width: 100%; height: auto; }
                 </style>
             </head>
             <body>
@@ -46,6 +49,7 @@ const PreviewPane = forwardRef<HTMLDivElement, PreviewPaneProps>(({ markdown, th
                     ${themedHtml}
                 </div>
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js"></script>
+                ${mermaidPreviewScriptTag()}
             </body>
             </html>
         `;

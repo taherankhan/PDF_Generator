@@ -12,7 +12,7 @@ interface ShareLinkButtonProps {
   payload: SharePayload;
   shareId?: string;
   onShareIdChange?: (id: string, options?: { skipLoad?: boolean }) => void;
-  onSaveSuccess?: (content: string, theme: string) => void;
+  onSaveSuccess?: (payload: SharePayload) => void;
 }
 
 const ShareLinkButton: FC<ShareLinkButtonProps> = ({ payload, shareId, onShareIdChange, onSaveSuccess }) => {
@@ -34,9 +34,9 @@ const ShareLinkButton: FC<ShareLinkButtonProps> = ({ payload, shareId, onShareId
         onShareIdChange(id, { skipLoad: true });
       }
       if (onSaveSuccess) {
-        onSaveSuccess(payload.content, payload.theme || "professional");
+        onSaveSuccess(payload);
       }
-      
+
       toast.success("Document shared! Link copied to clipboard.");
       setTimeout(() => setCopied(false), 2000);
     } catch (dbError) {
@@ -70,7 +70,7 @@ const ShareLinkButton: FC<ShareLinkButtonProps> = ({ payload, shareId, onShareId
       setIsSaving(true);
       await updateSharePayloadInDb(shareId, payload);
       if (onSaveSuccess) {
-        onSaveSuccess(payload.content, payload.theme || "professional");
+        onSaveSuccess(payload);
       }
       toast.success("Changes saved! Others viewing this link will see updates instantly.");
     } catch (error) {

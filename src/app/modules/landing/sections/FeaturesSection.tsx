@@ -12,13 +12,12 @@ type Feature = {
   visual: FeatureVisual;
 };
 
-/** Grounded in actual editor capabilities (EditorPage, themeConfig, pdfGenerator, shareLinkService). */
 const FEATURES: Feature[] = [
   {
     num: '01',
     tag: 'Core',
-    title: 'Live Editor & Preview',
-    desc: 'Split-screen workspace with marked.js rendering, Prism syntax highlighting, GFM support, and debounced real-time preview as you type.',
+    title: 'Pro Editor & Preview',
+    desc: 'CodeMirror workspace with Edit, Split, and Preview, formatting toolbar, emoji shortcuts, and debounced live preview.',
     accent: 'violet',
     visual: 'editor',
   },
@@ -26,23 +25,23 @@ const FEATURES: Feature[] = [
     num: '02',
     tag: 'Design',
     title: 'Six PDF Themes',
-    desc: 'Professional, Academic, Minimal, Creative, Dark, and Resume — each tuned for print typography, spacing, and A4-ready layouts.',
+    desc: 'Professional, Academic, Minimal, Creative, Dark, and Resume — tuned for print typography and A4-ready layouts.',
     accent: 'cyan',
     visual: 'themes',
   },
   {
     num: '03',
     tag: 'Output',
-    title: 'One-Click PDF Export',
-    desc: 'Export from the live preview via jsPDF and html2canvas with smart page-break rules — processed entirely in your browser.',
+    title: 'PDF, Markdown & HTML',
+    desc: 'Export menu with PDF as default, plus .md and themed HTML. Mermaid diagrams render in preview and exports.',
     accent: 'amber',
     visual: 'export',
   },
   {
     num: '04',
-    tag: 'Trust',
-    title: 'Private & Shareable',
-    desc: 'No sign-up to write or export. Share documents through compressed links — your markdown stays under your control.',
+    tag: 'Workflow',
+    title: 'Snippets & Cloud Share',
+    desc: 'Built-in content blocks for docs, code, and diagrams. Share via link with saved title and live updates when you choose to sync.',
     accent: 'green',
     visual: 'privacy',
   },
@@ -94,8 +93,10 @@ const FeatureVisualPanel: FC<{ type: FeatureVisual }> = ({ type }) => {
               <span className="lp-feat-doc-line lp-feat-doc-line--short" />
             </div>
           </div>
-          <div className="lp-feat-export-ring">
-            <span className="lp-feat-export-icon">↓</span>
+          <div className="lp-feat-export-formats">
+            <span className="lp-feat-format-pill">PDF</span>
+            <span className="lp-feat-format-pill">MD</span>
+            <span className="lp-feat-format-pill">HTML</span>
           </div>
         </div>
       );
@@ -107,7 +108,7 @@ const FeatureVisualPanel: FC<{ type: FeatureVisual }> = ({ type }) => {
           </div>
           <div className="lp-feat-orbit lp-feat-orbit--1" />
           <div className="lp-feat-orbit lp-feat-orbit--2" />
-          <span className="lp-feat-local-badge">LOCAL</span>
+          <span className="lp-feat-local-badge">LINK</span>
         </div>
       );
     default:
@@ -138,8 +139,8 @@ const FeaturesSection: FC = () => (
               <span className="lp-feat-title-accent">Nothing Extra.</span>
             </h2>
             <p className="lp-section-desc">
-              Every capability below maps to a real tool in the app — split editor, six themes,
-              PDF export, and private sharing. No fluff.
+              Every item below is in the app today — CodeMirror editing, content blocks, multi-format
+              export, Mermaid, and optional cloud sharing. No account required to start.
             </p>
           </div>
 

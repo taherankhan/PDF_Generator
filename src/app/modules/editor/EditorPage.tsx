@@ -1,15 +1,25 @@
-import { FC, useState, useRef, useEffect } from "react";
+import { FC, useState, useRef, useEffect, ChangeEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import MarkdownEditor from "./components/MarkdownEditor";
 import PreviewPane from "./components/PreviewPane";
 import ExportButton from "./components/ExportButton";
 import ThemeSelector from "./components/ThemeSelector";
 import ShareLinkButton from "./components/ShareLinkButton";
+import EditorViewToggle from "./components/EditorViewToggle";
+import ContentBlocksModal from "./components/ContentBlocksModal";
+import type { MarkdownEditorHandle } from "./lib/editorHandle";
 import "./EditorPage.css";
 import { AnalyticsService } from "../../../services/AnalyticsService";
-import { decodeSharePayload, fetchSharePayloadFromDb } from "../../../services/shareLinkService";
+import {
+    decodeSharePayload,
+    fetchSharePayloadFromDb,
+    normalizeShareTitle,
+    type SharePayload,
+} from "../../../services/shareLinkService";
 import { toast } from "react-toastify";
 import { getSupabase } from "../../../services/supabaseClient";
+import type { EditorViewMode } from "./lib/editorHandle";
+import { loadEditorDraft, loadStoredTitle, saveEditorDraft } from "./lib/editorDraft";
 
 const defaultMarkdown = `# Welcome to Markdown to PDF Converter
 
@@ -62,14 +72,43 @@ const EditorPage: FC = () => {
     const [markdownContent, setMarkdownContent] = useState(defaultMarkdown);
     const [debouncedMarkdown, setDebouncedMarkdown] = useState(defaultMarkdown);
     const [selectedTheme, setSelectedTheme] = useState("professional");
+    const [documentTitle, setDocumentTitle] = useState(() => loadStoredTitle());
+    const [viewMode, setViewMode] = useState<EditorViewMode>("split");
     const [fullScreenPane, setFullScreenPane] = useState<"editor" | "preview" | null>(null);
     const previewRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const editorRef = useRef<MarkdownEditorHandle>(null);
+    const [snippetsOpen, setSnippetsOpen] = useState(false);
+    const draftHydratedRef = useRef(false);
 
     const shareId = searchParams.get("share");
 
     const markdownRef = useRef(markdownContent);
     const themeRef = useRef(selectedTheme);
-    const lastSyncedPayload = useRef({ content: defaultMarkdown, theme: "professional" });
+    const titleRef = useRef(documentTitle);
+    const lastSyncedPayload = useRef<SharePayload>({
+        content: defaultMarkdown,
+        theme: "professional",
+        title: "",
+    });
+
+    const applySharePayload = (payload: SharePayload) => {
+        setMarkdownContent(payload.content);
+        if (payload.theme) setSelectedTheme(payload.theme);
+        const title = normalizeShareTitle(payload.title);
+        setDocumentTitle(title);
+        lastSyncedPayload.current = {
+            content: payload.content,
+            theme: payload.theme || "professional",
+            title,
+        };
+    };
+
+    const buildSharePayload = (): SharePayload => ({
+        content: markdownContent,
+        theme: selectedTheme,
+        title: documentTitle,
+    });
     const skipShareLoadRef = useRef<string | null>(null);
     const loadedShareIdsRef = useRef<Set<string>>(new Set());
     const suppressRemoteUntilRef = useRef(0);
@@ -82,6 +121,49 @@ const EditorPage: FC = () => {
         themeRef.current = selectedTheme;
     }, [selectedTheme]);
 
+    useEffect(() => {
+        titleRef.current = documentTitle;
+    }, [documentTitle]);
+
+    useEffect(() => {
+        if (draftHydratedRef.current) return;
+        if (shareId) {
+            draftHydratedRef.current = true;
+            return;
+        }
+        const hashPayload = decodeSharePayload();
+        if (hashPayload) {
+            draftHydratedRef.current = true;
+            return;
+        }
+        draftHydratedRef.current = true;
+        const draft = loadEditorDraft();
+        if (!draft) return;
+        setMarkdownContent(draft.content);
+        setDebouncedMarkdown(draft.content);
+        if (draft.title) setDocumentTitle(draft.title);
+        if (draft.theme) setSelectedTheme(draft.theme);
+        lastSyncedPayload.current = {
+            content: draft.content,
+            theme: draft.theme,
+            title: draft.title,
+        };
+        AnalyticsService.events.editorDraftRestore();
+        toast.info("Restored your last local draft.", { autoClose: 2500 });
+    }, [shareId]);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            saveEditorDraft({
+                content: markdownContent,
+                title: documentTitle,
+                theme: selectedTheme,
+                savedAt: Date.now(),
+            });
+        }, 800);
+        return () => clearTimeout(handler);
+    }, [markdownContent, documentTitle, selectedTheme]);
+
     const notifyRemoteUpdate = (message: string) => {
         if (Date.now() < suppressRemoteUntilRef.current) return;
         const toastId = shareId ? `share-remote-${shareId}` : "share-remote";
@@ -89,7 +171,6 @@ const EditorPage: FC = () => {
         toast.info(message, { toastId, autoClose: 3000 });
     };
 
-    // Supabase Realtime subscription for live updates (client loaded on demand)
     useEffect(() => {
         if (!shareId) return;
 
@@ -114,23 +195,38 @@ const EditorPage: FC = () => {
 
                         const newContent = payload.new.content as string;
                         const newTheme = (payload.new.theme as string) || 'professional';
+                        const newTitle = normalizeShareTitle(
+                            payload.new.title as string | undefined
+                        );
 
                         if (Date.now() < suppressRemoteUntilRef.current) {
-                            lastSyncedPayload.current = { content: newContent, theme: newTheme };
+                            lastSyncedPayload.current = {
+                                content: newContent,
+                                theme: newTheme,
+                                title: newTitle,
+                            };
                             return;
                         }
 
                         const matchesSynced =
                             newContent === lastSyncedPayload.current.content &&
-                            newTheme === lastSyncedPayload.current.theme;
+                            newTheme === lastSyncedPayload.current.theme &&
+                            newTitle === normalizeShareTitle(lastSyncedPayload.current.title);
                         const matchesLocal =
-                            newContent === markdownRef.current && newTheme === themeRef.current;
+                            newContent === markdownRef.current &&
+                            newTheme === themeRef.current &&
+                            newTitle === normalizeShareTitle(titleRef.current);
 
                         if (matchesSynced || matchesLocal) return;
 
                         setMarkdownContent(newContent);
                         setSelectedTheme(newTheme);
-                        lastSyncedPayload.current = { content: newContent, theme: newTheme };
+                        setDocumentTitle(newTitle);
+                        lastSyncedPayload.current = {
+                            content: newContent,
+                            theme: newTheme,
+                            title: newTitle,
+                        };
                         notifyRemoteUpdate('Document updated live by another user!');
                     }
                 )
@@ -154,7 +250,6 @@ const EditorPage: FC = () => {
         };
     }, [shareId]);
 
-    // Polling fallback — silent sync only (realtime handles user-facing toast)
     useEffect(() => {
         if (!shareId) return;
 
@@ -163,22 +258,23 @@ const EditorPage: FC = () => {
                 const payload = await fetchSharePayloadFromDb(shareId);
                 if (!payload) return;
 
-                const isCloudUpdated = payload.content !== lastSyncedPayload.current.content ||
-                                      payload.theme !== lastSyncedPayload.current.theme;
+                const remoteTitle = normalizeShareTitle(payload.title);
+                const isCloudUpdated =
+                    payload.content !== lastSyncedPayload.current.content ||
+                    payload.theme !== lastSyncedPayload.current.theme ||
+                    remoteTitle !== normalizeShareTitle(lastSyncedPayload.current.title);
 
                 if (!isCloudUpdated) return;
 
-                const hasLocalEdits = markdownRef.current !== lastSyncedPayload.current.content ||
-                                      themeRef.current !== lastSyncedPayload.current.theme;
+                const hasLocalEdits =
+                    markdownRef.current !== lastSyncedPayload.current.content ||
+                    themeRef.current !== lastSyncedPayload.current.theme ||
+                    normalizeShareTitle(titleRef.current) !==
+                        normalizeShareTitle(lastSyncedPayload.current.title);
 
                 if (hasLocalEdits) return;
 
-                setMarkdownContent(payload.content);
-                if (payload.theme) setSelectedTheme(payload.theme);
-                lastSyncedPayload.current = {
-                    content: payload.content,
-                    theme: payload.theme || "professional"
-                };
+                applySharePayload(payload);
             } catch (err) {
                 console.error("Error polling for database updates:", err);
             }
@@ -187,7 +283,6 @@ const EditorPage: FC = () => {
         return () => clearInterval(interval);
     }, [shareId]);
 
-    // Debounce preview rendering to fix typing lag
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedMarkdown(markdownContent);
@@ -197,7 +292,6 @@ const EditorPage: FC = () => {
         };
     }, [markdownContent]);
 
-    // Hydrate from shared link on shareId change (once per id)
     useEffect(() => {
         if (!shareId) return;
 
@@ -221,12 +315,7 @@ const EditorPage: FC = () => {
                 if (cancelled) return;
 
                 if (payload) {
-                    setMarkdownContent(payload.content);
-                    if (payload.theme) setSelectedTheme(payload.theme);
-                    lastSyncedPayload.current = {
-                        content: payload.content,
-                        theme: payload.theme || "professional"
-                    };
+                    applySharePayload(payload);
                     loadedShareIdsRef.current.add(shareId);
                     toast.update(toastId, {
                         render: "Document loaded successfully!",
@@ -260,7 +349,6 @@ const EditorPage: FC = () => {
         };
     }, [shareId]);
 
-    // Legacy hash links (no share id)
     useEffect(() => {
         if (shareId) return;
         const payload = decodeSharePayload();
@@ -290,34 +378,101 @@ const EditorPage: FC = () => {
         setSearchParams({ share: newId });
     };
 
+    const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        e.target.value = '';
+        if (!file) return;
+
+        const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+        const allowed = ['md', 'markdown', 'txt', 'text'];
+        if (!allowed.includes(ext) && !file.type.startsWith('text/')) {
+            toast.error('Upload a .md, .markdown, or .txt file.');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            const text = typeof reader.result === 'string' ? reader.result : '';
+            setMarkdownContent(text);
+            const base = file.name.replace(/\.[^.]+$/, '');
+            if (base) setDocumentTitle(base);
+            AnalyticsService.events.editorFileUpload(ext || file.type || 'unknown');
+            toast.success(`Loaded ${file.name}`);
+        };
+        reader.onerror = () => toast.error('Could not read file.');
+        reader.readAsText(file);
+    };
+
+    const layoutModeClass =
+        fullScreenPane === 'editor'
+            ? 'layout-mode-edit'
+            : fullScreenPane === 'preview'
+              ? 'layout-mode-preview'
+              : `layout-mode-${viewMode}`;
+
+    const showEditorPane = fullScreenPane !== 'preview' && (fullScreenPane === 'editor' || viewMode !== 'preview');
+    const showPreviewPane = fullScreenPane !== 'editor' && (fullScreenPane === 'preview' || viewMode !== 'edit');
+
     return (
         <div className="editor-page">
-            {/* Compact Professional Toolbar */}
             <div className={`editor-toolbar ${fullScreenPane ? 'd-none' : ''}`}>
                 <div className="toolbar-left">
                     <button
                         className="btn-icon btn-back"
                         onClick={() => navigate('/')}
                         title="Back to Home"
+                        type="button"
                     >
                         <i className="bi bi-arrow-left"></i>
                     </button>
                     <div className="toolbar-divider"></div>
-                    <div className="toolbar-title">
-                        <h1>
-                            <i className="bi bi-file-earmark-text me-2"></i>
-                            Markdown to PDF
-                        </h1>
-                    </div>
+                    <input
+                        type="text"
+                        className="editor-doc-title-input"
+                        value={documentTitle}
+                        onChange={(e) => setDocumentTitle(e.target.value)}
+                        placeholder="Untitled document"
+                        aria-label="Document title"
+                    />
                 </div>
 
                 <div className="toolbar-right">
+                    <EditorViewToggle mode={viewMode} onChange={setViewMode} />
+                    <button
+                        type="button"
+                        className="editor-upload-btn"
+                        onClick={() => fileInputRef.current?.click()}
+                    >
+                        <i className="bi bi-upload" aria-hidden />
+                        <span className="editor-upload-label">Upload .md</span>
+                    </button>
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".md,.markdown,.txt,text/plain,text/markdown"
+                        className="visually-hidden"
+                        onChange={handleFileUpload}
+                    />
+                    <div className="toolbar-divider" aria-hidden />
+                    <button
+                        type="button"
+                        className="btn-snippets"
+                        onClick={() => setSnippetsOpen(true)}
+                        title="Content blocks and snippets"
+                    >
+                        <i className="bi bi-grid-3x3-gap" aria-hidden />
+                        <span className="btn-snippets-label">Snippets</span>
+                    </button>
                     <ShareLinkButton
-                        payload={{ content: markdownContent, theme: selectedTheme }}
+                        payload={buildSharePayload()}
                         shareId={shareId || undefined}
                         onShareIdChange={handleShareIdChange}
-                        onSaveSuccess={(savedContent, savedTheme) => {
-                            lastSyncedPayload.current = { content: savedContent, theme: savedTheme };
+                        onSaveSuccess={(saved) => {
+                            lastSyncedPayload.current = {
+                                content: saved.content,
+                                theme: saved.theme || "professional",
+                                title: normalizeShareTitle(saved.title),
+                            };
                             suppressRemoteUntilRef.current = Date.now() + 5000;
                         }}
                     />
@@ -329,31 +484,51 @@ const EditorPage: FC = () => {
                         markdown={markdownContent}
                         themeId={selectedTheme}
                         previewRef={previewRef}
+                        exportBaseName={documentTitle}
                     />
                 </div>
             </div>
 
-            {/* Main Content */}
-            <div className={`editor-content ${fullScreenPane ? 'top-0' : ''}`}>
-                <div className={`editor-layout ${fullScreenPane ? 'layout-fullscreen' : 'layout-split'}`}>
-                    <div className={`editor-pane ${fullScreenPane === 'preview' ? 'd-none' : ''} ${fullScreenPane === 'editor' ? 'w-100 border-0' : ''}`}>
-                        <MarkdownEditor
-                            value={markdownContent}
-                            onChange={setMarkdownContent}
-                            isFullScreen={fullScreenPane === 'editor'}
-                            onToggleFullScreen={() => toggleFullScreen('editor')}
-                        />
-                    </div>
+            <ContentBlocksModal
+                open={snippetsOpen}
+                onClose={() => setSnippetsOpen(false)}
+                onInsert={(text) => {
+                    editorRef.current?.insertText(text);
+                    editorRef.current?.focus();
+                }}
+            />
 
-                    <div className={`preview-pane ${fullScreenPane === 'editor' ? 'd-none' : ''} ${fullScreenPane === 'preview' ? 'w-100 border-0' : ''}`}>
-                        <PreviewPane
-                            ref={previewRef}
-                            markdown={debouncedMarkdown}
-                            themeId={selectedTheme}
-                            isFullScreen={fullScreenPane === 'preview'}
-                            onToggleFullScreen={() => toggleFullScreen('preview')}
-                        />
-                    </div>
+            <div className={`editor-content ${fullScreenPane ? 'top-0' : ''}`}>
+                <div
+                    className={`editor-layout layout-split ${layoutModeClass} ${fullScreenPane ? 'layout-fullscreen' : ''}`}
+                >
+                    {showEditorPane && (
+                        <div
+                            className={`editor-pane ${fullScreenPane === 'preview' ? 'd-none' : ''} ${fullScreenPane === 'editor' ? 'w-100 border-0' : ''}`}
+                        >
+                            <MarkdownEditor
+                                ref={editorRef}
+                                value={markdownContent}
+                                onChange={setMarkdownContent}
+                                isFullScreen={fullScreenPane === 'editor'}
+                                onToggleFullScreen={() => toggleFullScreen('editor')}
+                            />
+                        </div>
+                    )}
+
+                    {showPreviewPane && (
+                        <div
+                            className={`preview-pane ${fullScreenPane === 'editor' ? 'd-none' : ''} ${fullScreenPane === 'preview' ? 'w-100 border-0' : ''}`}
+                        >
+                            <PreviewPane
+                                ref={previewRef}
+                                markdown={debouncedMarkdown}
+                                themeId={selectedTheme}
+                                isFullScreen={fullScreenPane === 'preview'}
+                                onToggleFullScreen={() => toggleFullScreen('preview')}
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

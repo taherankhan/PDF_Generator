@@ -33,7 +33,7 @@ export const USE_CASES: UseCase[] = [
     icon: '📊',
     cls: 'fi-cyan',
     title: 'Technical Reports',
-    desc: 'Write code-inclusive technical reports and documentation. Fenced code blocks, tables, and diagrams all render beautifully.',
+    desc: 'Fenced code, tables, and Mermaid diagrams in preview — export to PDF, Markdown, or HTML when you are ready.',
     tag: '💻 Developer Favourite',
     num: '02',
   },
@@ -55,27 +55,36 @@ export const USE_CASES: UseCase[] = [
   },
 ];
 
+/** Matches editor `themeConfig` names — used for hero/themes preview only */
 export const THEMES: PdfTheme[] = [
-  { name: 'Aurora', desc: 'Clean & Minimal', bg: 'linear-gradient(135deg,#f8fafc,#e2e8f0)', text: '#1e293b' },
-  { name: 'Midnight', desc: 'Dark & Bold', bg: 'linear-gradient(135deg,#0f172a,#1e293b)', text: '#f1f5f9' },
-  { name: 'Ocean', desc: 'Corporate Blue', bg: 'linear-gradient(135deg,#eff6ff,#dbeafe)', text: '#1e40af' },
-  { name: 'Forest', desc: 'Earthy & Natural', bg: 'linear-gradient(135deg,#f0fdf4,#dcfce7)', text: '#166534' },
-  { name: 'Sunset', desc: 'Warm & Inviting', bg: 'linear-gradient(135deg,#fff7ed,#fde68a)', text: '#92400e' },
+  { name: 'Professional', desc: 'Default print style', bg: 'linear-gradient(135deg,#f8fafc,#e2e8f0)', text: '#1e293b' },
+  { name: 'Academic', desc: 'Formal documents', bg: 'linear-gradient(135deg,#fffbeb,#fef3c7)', text: '#422006' },
+  { name: 'Minimal', desc: 'Light & airy', bg: 'linear-gradient(135deg,#ffffff,#f1f5f9)', text: '#334155' },
+  { name: 'Creative', desc: 'Accent headings', bg: 'linear-gradient(135deg,#faf5ff,#ede9fe)', text: '#5b21b6' },
+  { name: 'Dark', desc: 'Low-light reading', bg: 'linear-gradient(135deg,#0f172a,#1e293b)', text: '#f1f5f9' },
+  { name: 'Resume', desc: 'CV-friendly', bg: 'linear-gradient(135deg,#ecfdf5,#d1fae5)', text: '#065f46' },
 ];
 
 export const STEPS: WorkflowStep[] = [
-  { num: '1', title: 'Write Markdown', desc: 'Type in the live editor — headings, lists, code, tables, links.' },
-  { num: '2', title: 'Pick a Theme', desc: 'Choose one of 6 handcrafted PDF themes from the toolbar.' },
-  { num: '3', title: 'Preview Live', desc: 'See exactly how your PDF will look in the side-by-side pane.' },
-  { num: '4', title: 'Export PDF', desc: 'Hit export — your pixel-perfect PDF downloads in under a second.' },
+  { num: '1', title: 'Write or insert', desc: 'Type markdown, use content-block snippets, or upload a .md file.' },
+  { num: '2', title: 'Edit & preview', desc: 'Switch Edit, Split, or Preview — format bar, emoji, and Mermaid in the pane.' },
+  { num: '3', title: 'Theme & share', desc: 'Pick a PDF theme; optional cloud link with live sync and document title.' },
+  { num: '4', title: 'Export', desc: 'Download PDF (default), Markdown, or HTML — rendered in your browser.' },
 ];
 
 export const STATS = [
   { value: '6', label: 'PDF Themes' },
-  { value: '0', label: 'Server Uploads' },
-  { value: '100%', label: 'Client-Side Export' },
-  { value: '∞', label: 'Free Forever' },
+  { value: '20+', label: 'Snippets' },
+  { value: '3', label: 'Export Formats' },
+  { value: '∞', label: 'Free to Use' },
 ];
+
+export const HERO_FEATURE_CHIPS = [
+  'Split editor',
+  'Mermaid',
+  'Snippets',
+  'PDF · MD · HTML',
+] as const;
 
 export const DEVELOPER = {
   githubUsername: 'taherankhan',
@@ -90,9 +99,4 @@ export const FOOTER_NAV = [
   { label: 'Themes', sectionId: 'lp-themes' },
 ] as const;
 
-export const themeSwatchBg = (name: string, bg: string) => {
-  if (name === 'Ocean') return 'linear-gradient(135deg, #e0f2fe, #bae6fd)';
-  if (name === 'Forest') return 'linear-gradient(135deg, #dcfce7, #bbf7d0)';
-  if (name === 'Sunset') return 'linear-gradient(135deg, #fef08a, #fde047)';
-  return bg;
-};
+export const themeSwatchBg = (_name: string, bg: string) => bg;

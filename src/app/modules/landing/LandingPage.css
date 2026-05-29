@@ -562,9 +562,33 @@ html {
 .lp-hero-sub {
   font-size: clamp(16px, 2vw, 20px);
   color: var(--clr-muted);
-  max-width: 600px;
-  margin: 0 auto 20px;
+  max-width: 640px;
+  margin: 0 auto 14px;
   line-height: 1.7;
+}
+
+.lp-hero-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 520px;
+  margin: 0 auto 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.lp-hero-chip {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .lp-hero-actions {
@@ -3598,6 +3622,22 @@ html {
   outline-offset: 2px;
 }
 
+.lp-mockup-pill {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.lp-mockup-pill--accent {
+  border-color: rgba(108, 99, 255, 0.45);
+  color: #c4b5fd;
+  background: rgba(108, 99, 255, 0.12);
+}
+
 .lp-mockup-preview-label {
   font-size: 12px;
   color: #475569;
@@ -4265,6 +4305,24 @@ html {
 
 .lp-feat-doc-line--short {
   width: 65%;
+}
+
+.lp-feat-export-formats {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  justify-content: center;
+}
+
+.lp-feat-format-pill {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fcd34d;
 }
 
 .lp-feat-export-ring {

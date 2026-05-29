@@ -9,8 +9,8 @@ const UseCasesSection: FC = () => (
         <div className="lp-section-label">Use Cases</div>
         <h2 className="lp-section-title">Built for Real-World<br />Workflows</h2>
         <p className="lp-section-desc">
-          Whether you&apos;re a developer, student, or business professional — PDF Generator fits
-          right into your workflow.
+          Whether you&apos;re a developer, student, or business professional — write locally, share when
+          you need to, and export in the format your audience expects.
         </p>
       </div>
 

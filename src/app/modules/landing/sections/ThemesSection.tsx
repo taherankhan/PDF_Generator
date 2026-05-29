@@ -51,8 +51,8 @@ const ThemesSection: FC<Props> = ({ selectedTheme, onThemeChange }) => (
             <span className="lp-themes-title-accent">PDF Themes</span>
           </h2>
           <p className="lp-section-desc">
-            Pick a theme before you export. Every theme is designed to look stunning in print.
-            Click any row to preview it live.
+            Same names as in the editor — Professional through Resume. Preview here, then use them
+            for PDF and HTML export.
           </p>
           <div className="lp-themes-list">
             {THEMES.map((th) => (

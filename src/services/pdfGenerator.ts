@@ -9,6 +9,11 @@ import {
   PDF_MAX_CANVAS_PIXELS,
   PDF_MAX_MARKDOWN_CHARS,
 } from './pdfErrors';
+import {
+  MERMAID_DIAGRAM_STYLES,
+  renderMermaidInDocument,
+  waitForMermaidPaint,
+} from './renderMermaidInDocument';
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -230,11 +235,12 @@ export const generatePDFFromMarkdown = async (
   document.body.appendChild(container);
 
   try {
-    // Apply Prism syntax highlighting like preview does
+    await renderMermaidInDocument(document);
+    await waitForMermaidPaint(500);
+
     Prism.highlightAllUnder(container);
-    
-    // Wait for rendering and highlighting to complete
-    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     const canvas = await withTimeout(
       html2canvas(container, {
@@ -409,6 +415,10 @@ export const generatePDFFromElement = async (
                     break-after: avoid !important;
                 }
 
+                .mermaid { display: flex; justify-content: center; margin: 1rem 0; max-width: 100%; }
+                .mermaid svg { max-width: 100%; height: auto; }
+                ${MERMAID_DIAGRAM_STYLES}
+
                 /* User Custom Styles (Injected last to override defaults) */
                 ${iframeStyles}
             </style>
@@ -424,8 +434,10 @@ export const generatePDFFromElement = async (
       `);
       sandboxDoc.close();
 
-      // Wait for resources in sandbox to load
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await renderMermaidInDocument(sandboxDoc);
+      await waitForMermaidPaint(600);
+
+      await new Promise((resolve) => setTimeout(resolve, 400));
       
       const wrapper = sandboxDoc.body;
 

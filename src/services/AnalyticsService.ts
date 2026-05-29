@@ -50,6 +50,13 @@ export const AnalyticsService = {
     exportPDF: (theme: string, chars: number) => {
       AnalyticsService.trackEvent('Export', 'Download PDF', `Theme: ${theme}, Length: ${chars}`);
     },
+    exportDocument: (format: string, theme: string, chars: number) => {
+      AnalyticsService.trackEvent(
+        'Export',
+        `Download ${format.toUpperCase()}`,
+        `Theme: ${theme}, Length: ${chars}`
+      );
+    },
     changeTheme: (theme: string) => {
       AnalyticsService.trackEvent('Appearance', 'Change Theme', theme);
     },
@@ -62,6 +69,21 @@ export const AnalyticsService = {
     },
     uploadFile: (fileType: string) => {
       AnalyticsService.trackEvent('Content', 'Upload File', fileType);
+    },
+    editorViewMode: (mode: string) => {
+      AnalyticsService.trackEvent('Editor', 'View Mode', mode);
+    },
+    editorFormat: (action: string) => {
+      AnalyticsService.trackEvent('Editor', 'Format', action);
+    },
+    editorDraftRestore: () => {
+      AnalyticsService.trackEvent('Editor', 'Draft', 'restore');
+    },
+    editorFileUpload: (fileType: string) => {
+      AnalyticsService.trackEvent('Editor', 'Upload', fileType);
+    },
+    editorSnippetInsert: (category: string) => {
+      AnalyticsService.trackEvent('Editor', 'Snippet Insert', category);
     },
 
     /** Landing page */
