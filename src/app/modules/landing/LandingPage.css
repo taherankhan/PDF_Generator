@@ -551,6 +551,14 @@ html {
   -webkit-text-fill-color: transparent;
 }
 
+/* Hero headline + subcopy: always painted (avoids multi-second LCP render delay) */
+.lp-hero-title .lp-hero-title-line,
+.lp-hero-sub {
+  opacity: 1;
+  animation: none;
+  transform: none;
+}
+
 .lp-hero-sub {
   font-size: clamp(16px, 2vw, 20px);
   color: var(--clr-muted);
@@ -3626,6 +3634,11 @@ html {
   text-decoration: underline;
 }
 
+.pv-link--decorative {
+  cursor: default;
+  pointer-events: none;
+}
+
 .lp-mockup-preview .pv-code {
   margin-right: 4px;
 }
@@ -4346,7 +4359,14 @@ html {
     align-items: start;
   }
 
+  .lp-feat-matrix {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
   .lp-feat-header {
+    grid-column: 2;
+    grid-row: 1;
     position: sticky;
     top: calc(var(--lp-header-h, 64px) + 16px);
     justify-self: end;
@@ -4358,15 +4378,6 @@ html {
     max-width: none;
   }
 
-  .lp-feat-matrix {
-    align-self: start;
-  }
-}
-
-@media (max-width: 1023px) {
-  .lp-feat-header {
-    order: -1;
-  }
 }
 
 @media (max-width: 768px) {

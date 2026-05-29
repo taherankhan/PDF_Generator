@@ -131,6 +131,18 @@ const FeaturesSection: FC = () => (
     <section id="lp-features" className="lp-section lp-features-bg">
       <div className="lp-section-inner">
         <div className="lp-feat-layout">
+          <div className="lp-feat-header lp-reveal lp-reveal--sticky">
+            <div className="lp-section-label">Features</div>
+            <h2 className="lp-section-title">
+              Built Into the Editor.<br />
+              <span className="lp-feat-title-accent">Nothing Extra.</span>
+            </h2>
+            <p className="lp-section-desc">
+              Every capability below maps to a real tool in the app — split editor, six themes,
+              PDF export, and private sharing. No fluff.
+            </p>
+          </div>
+
           <div className="lp-feat-matrix">
             <div className="lp-feat-matrix-glow" aria-hidden="true" />
             <div className="lp-feat-matrix-grid">
@@ -154,18 +166,6 @@ const FeaturesSection: FC = () => (
                 </article>
               ))}
             </div>
-          </div>
-
-          <div className="lp-feat-header lp-reveal lp-reveal--sticky">
-            <div className="lp-section-label">Features</div>
-            <h2 className="lp-section-title">
-              Built Into the Editor.<br />
-              <span className="lp-feat-title-accent">Nothing Extra.</span>
-            </h2>
-            <p className="lp-section-desc">
-              Every capability below maps to a real tool in the app — split editor, six themes,
-              PDF export, and private sharing. No fluff.
-            </p>
           </div>
         </div>
       </div>
