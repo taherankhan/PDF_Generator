@@ -504,7 +504,7 @@ const EditorPage: FC = () => {
                 >
                     {showEditorPane && (
                         <div
-                            className={`editor-pane ${fullScreenPane === 'preview' ? 'd-none' : ''} ${fullScreenPane === 'editor' ? 'w-100 border-0' : ''}`}
+                            className={`editor-pane ${fullScreenPane === 'editor' ? 'w-100 border-0' : ''}`}
                         >
                             <MarkdownEditor
                                 ref={editorRef}
@@ -518,7 +518,7 @@ const EditorPage: FC = () => {
 
                     {showPreviewPane && (
                         <div
-                            className={`preview-pane ${fullScreenPane === 'editor' ? 'd-none' : ''} ${fullScreenPane === 'preview' ? 'w-100 border-0' : ''}`}
+                            className={`preview-pane ${fullScreenPane === 'preview' ? 'w-100 border-0' : ''}`}
                         >
                             <PreviewPane
                                 ref={previewRef}
